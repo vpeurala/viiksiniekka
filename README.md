@@ -1,2 +1,2 @@
-A code generator in Scala. Uses parboiled2.
+A code generator to end all code generators.
 
