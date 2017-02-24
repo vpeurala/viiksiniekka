@@ -1,0 +1,4 @@
+CREATE TABLE company (
+  id BIGSERIAL PRIMARY KEY,
+  name VARCHAR NOT NULL
+);

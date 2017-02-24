@@ -1,0 +1,482 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain>
+    <meta>
+        <rootpackage>com.shipyard</rootpackage>
+    </meta>
+    <domaintypes>
+        <entity name="Notification">
+            <doc>A notification about workers and their work hours.</doc>
+            <fields>
+                <field name="status" ref="NotificationStatus">
+                    <doc>The state of the notification.</doc>
+                </field>
+                <field name="yardContact" ref="ContactPerson">
+                    <doc>The responsible person about this notification on the yard side.</doc>
+                </field>
+                <field name="siteForeman" ref="ContactPerson">
+                    <doc>The site foreman who is on the premises supervising the work.</doc>
+                </field>
+                <field name="additionalInformation" type="String">
+                    <doc>Comments and additional info.</doc>
+                </field>
+                <field name="workWeek" ref="Workweek">
+                    <doc>The working week this notification is about.</doc>
+                </field>
+                <field name="workEntries" list-ref="WorkEntry">
+                    <doc>Entries about each worker, his/her location and energy requirements.</doc>
+                </field>
+                <field name="log" list-ref="LogEntry">
+                    <doc>All events in the history of the notification.</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Notification 1">
+                    <fieldvalue field="status">Approved</fieldvalue>
+                    <fieldvalue field="yardContact" ref="Tero Packalen with contact information"/>
+                    <fieldvalue field="siteForeman" ref="Ville Peurala with contact information"/>
+                    <fieldvalue field="additionalInformation">Sunday work is needed because we are behind schedule.</fieldvalue>
+                    <fieldvalue field="workWeek" ref="Week 48"/>
+                    <fieldvalue field="workEntries">
+                        <list>
+                            <entry ref="Jurij as a welder in building 44 / ship 2"/>
+                            <entry ref="Genadij as a fitter in building 43"/>
+                        </list>
+                    </fieldvalue>
+                </example>
+            </examples>
+        </entity>
+        <enumeration name="NotificationStatus">
+            <doc>The state a notification is in.</doc>
+            <member>Approved</member>
+            <member>Draft</member>
+            <member>Rejected</member>
+            <member>Waiting for yard contact</member>
+            <member>Waiting for production manager</member>
+        </enumeration>
+        <entity name="Company">
+            <doc>A company.</doc>
+            <fields>
+                <field name="name" type="String">
+                    <doc>The name of the company.</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Ablemans">
+                    <fieldvalue field="name">Ablemans</fieldvalue>
+                </example>
+                <example name="Maersk">
+                    <fieldvalue field="name">Maersk</fieldvalue>
+                </example>
+                <example name="STX Group">
+                    <fieldvalue field="name">STX Group</fieldvalue>
+                </example>
+            </examples>
+        </entity>
+        <entity name="Person">
+            <doc>A person's basic information (currently only name).</doc>
+            <fields>
+                <field name="firstName" type="String">
+                    <doc>First name, for example "Ville".</doc>
+                </field>
+                <field name="lastName" type="String">
+                    <doc>Last name, for example "Peurala".</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Ville Peurala">
+                    <fieldvalue field="firstName">Ville</fieldvalue>
+                    <fieldvalue field="lastName">Peurala</fieldvalue>
+                </example>
+                <example name="Tero Packalen">
+                    <fieldvalue field="firstName">Tero</fieldvalue>
+                    <fieldvalue field="lastName">Packalen</fieldvalue>
+                </example>
+            </examples>
+        </entity>
+        <entity name="EmployedPerson">
+            <doc>A person with a company (the person's employer).</doc>
+            <extends supertype="Person"/>
+            <fields>
+                <field name="company" ref="Company">
+                    <doc>The company the person works for.</doc>
+                </field>
+            </fields>
+        </entity>
+        <valueobject name="ContactInformation">
+            <doc>Email and phone number.</doc>
+            <fields>
+                <field name="email" type="String">
+                    <doc>Email address, for example "ville.peurala@mail.com".</doc>
+                </field>
+                <field name="phoneNumber" type="String">
+                    <doc>Phone number, for example "050 - 352 7878".</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Contact information for Ville Peurala">
+                    <fieldvalue field="email">ville.peurala@mail.com</fieldvalue>
+                    <fieldvalue field="phoneNumber">050 - 352 7878</fieldvalue>
+                </example>
+                <example name="Contact information for Tero Packalen">
+                    <fieldvalue field="email">tero.packalen@yard.com</fieldvalue>
+                    <fieldvalue field="phoneNumber">040 - 568 3313</fieldvalue>
+                </example>
+            </examples>
+        </valueobject>
+        <entity name="ContactPerson">
+            <doc>A person with contact information.</doc>
+            <extends supertype="EmployedPerson"/>
+            <fields>
+                <field name="contactInformation" ref="ContactInformation"/>
+            </fields>
+            <examples>
+                <example name="Ville Peurala with contact information">
+                    <fieldvalue field="firstName">Ville</fieldvalue>
+                    <fieldvalue field="lastName">Ville</fieldvalue>
+                    <fieldvalue field="contactInformation" ref="Contact information for Ville Peurala"/>
+                </example>
+                <example name="Tero Packalen with contact information">
+                    <fieldvalue field="firstName">Tero</fieldvalue>
+                    <fieldvalue field="lastName">Packalen</fieldvalue>
+                    <fieldvalue field="contactInformation" ref="Contact information for Tero Packalen"/>
+                </example>
+            </examples>
+        </entity>
+        <entity name="Worker">
+            <doc>A person with a worker key code.</doc>
+            <extends supertype="EmployedPerson"/>
+            <fields>
+                <field name="keyCode" type="String">
+                    <doc>A worker's unique identifying code, for example "4060".</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Jurij Andrejev">
+                    <fieldvalue field="firstName">Jurij</fieldvalue>
+                    <fieldvalue field="lastName">Andrejev</fieldvalue>
+                    <fieldvalue field="keyCode">4060</fieldvalue>
+                </example>
+                <example name="Genadij Bogira">
+                    <fieldvalue field="firstName">Genadij</fieldvalue>
+                    <fieldvalue field="lastName">Bogira</fieldvalue>
+                    <fieldvalue field="keyCode">2332</fieldvalue>
+                </example>
+            </examples>
+        </entity>
+        <entity name="User">
+            <doc>A user of the application.</doc>
+            <extends supertype="ContactPerson"/>
+            <fields>
+                <field name="confirmed" type="Boolean">
+                    <doc>Whether this user is activated by confirming the email address.</doc>
+                </field>
+                <field name="token" type="String">
+                    <doc>An identification token for the user.</doc>
+                </field>
+                <field name="password" type="String">
+                    <doc>A one-way hash of the user's password.</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="ville.peurala@gmail.com">
+                    <fieldvalue field="firstName">Ville</fieldvalue>
+                    <fieldvalue field="lastName">Ville</fieldvalue>
+                    <fieldvalue field="company" ref="STX Group"/>
+                    <fieldvalue field="contactInformation" ref="Contact information for Ville Peurala"/>
+                    <fieldvalue field="confirmed">true</fieldvalue>
+                    <fieldvalue field="token">76696c6c652e70657572616c614077756e646572646f672e6670</fieldvalue>
+                </example>
+                <example name="tero.packalen@yard.com">
+                    <fieldvalue field="firstName">Tero</fieldvalue>
+                    <fieldvalue field="lastName">Packalen</fieldvalue>
+                    <fieldvalue field="company" ref="Maersk"/>
+                    <fieldvalue field="contactInformation" ref="Contact information for Tero Packalen"/>
+                    <fieldvalue field="confirmed">true</fieldvalue>
+                    <fieldvalue field="token">76696c6c652e70657572616c614077756e646572646f672e6671</fieldvalue>
+                </example>
+            </examples>
+        </entity>
+        <valueobject name="Signup">
+            <doc>Signup info for a user.</doc>
+            <fields>
+                <field name="firstName" type="String"/>
+                <field name="lastName" type="String"/>
+                <field name="email" type="String"/>
+                <field name="phoneNumber" type="String"/>
+                <field name="company" ref="Company"/>
+                <field name="password" type="String"/>
+            </fields>
+        </valueobject>
+        <valueobject name="Workweek">
+            <doc>A working week number and days with times.</doc>
+            <fields>
+                <field name="weekNumber" type="Integer">
+                    <doc>A ISO week number, minimum is 1, maximum is 53.</doc>
+                </field>
+                <field name="monday" ref="Workday" optional="true"/>
+                <field name="tuesday" ref="Workday" optional="true"/>
+                <field name="wednesday" ref="Workday" optional="true"/>
+                <field name="thursday" ref="Workday" optional="true"/>
+                <field name="friday" ref="Workday" optional="true"/>
+                <field name="saturday" ref="Workday" optional="true"/>
+                <field name="sunday" ref="Workday" optional="true"/>
+            </fields>
+            <examples>
+                <example name="Week 48">
+                    <fieldvalue field="weekNumber">48</fieldvalue>
+                    <fieldvalue field="monday" ref="Monday"/>
+                    <fieldvalue field="wednesday" ref="Wednesday"/>
+                    <fieldvalue field="sunday" ref="Sunday"/>
+                </example>
+            </examples>
+        </valueobject>
+        <valueobject name="Workday">
+            <doc>The working time of one day.</doc>
+            <fields>
+                <field name="startTime" ref="TimeOfDay">
+                    <doc>Starting time of the workday without time zone.</doc>
+                </field>
+                <field name="endTime" ref="TimeOfDay">
+                    <doc>Ending time of the workday without time zone.</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Monday">
+                    <fieldvalue field="startTime" ref="t 10:15" />
+                    <fieldvalue field="endTime" ref="t 18:30" />
+                </example>
+                <example name="Wednesday">
+                    <fieldvalue field="startTime" ref="t 07:00" />
+                    <fieldvalue field="endTime" ref="t 16:20" />
+                </example>
+                <example name="Sunday">
+                    <fieldvalue field="startTime" ref="t 10:00" />
+                    <fieldvalue field="endTime" ref="t 14:00" />
+                </example>
+            </examples>
+        </valueobject>
+        <valueobject name="TimeOfDay">
+            <doc>The time of day without a date.</doc>
+            <fields>
+                <field name="hour" type="Integer">
+                    <doc>The hour using 24-hour clock, value is 0-23.</doc>
+                </field>
+                <field name="minute" type="Integer">
+                    <doc>The minute, value is 0-59.</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="t 07:00">
+                    <fieldvalue field="hour">7</fieldvalue>
+                    <fieldvalue field="minute">0</fieldvalue>
+                </example>
+                <example name="t 10:00">
+                    <fieldvalue field="hour">10</fieldvalue>
+                    <fieldvalue field="minute">0</fieldvalue>
+                </example>
+                <example name="t 10:15">
+                    <fieldvalue field="hour">10</fieldvalue>
+                    <fieldvalue field="minute">15</fieldvalue>
+                </example>
+                <example name="t 14:00">
+                    <fieldvalue field="hour">14</fieldvalue>
+                    <fieldvalue field="minute">0</fieldvalue>
+                </example>
+                <example name="t 16:20">
+                    <fieldvalue field="hour">16</fieldvalue>
+                    <fieldvalue field="minute">20</fieldvalue>
+                </example>
+                <example name="t 18:30">
+                    <fieldvalue field="hour">18</fieldvalue>
+                    <fieldvalue field="minute">30</fieldvalue>
+                </example>
+            </examples>
+        </valueobject>
+        <entity name="WorkEntry">
+            <doc>Entry about one worker, his/her location and energy requirements.</doc>
+            <fields>
+                <field name="worker" ref="Worker"/>
+                <field name="location" ref="Location">
+                    <doc>The place where the worker will be working at, for example "Building 5 / Ship 2".</doc>
+                </field>
+                <field name="occupation" ref="Occupation">
+                    <doc>The task which the worker will be performing.</doc>
+                </field>
+                <field name="energyRequirements" ref="EnergyRequirements">
+                    <doc>The energies that the worker requires to do his/her job.</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Jurij as a welder in building 44 / ship 2">
+                    <fieldvalue field="worker" ref="Jurij Andrejev"/>
+                    <fieldvalue field="location" ref="At Building 44 / Ship 2"/>
+                    <fieldvalue field="occupation">Welder</fieldvalue>
+                    <fieldvalue field="energyRequirements" ref="Energy requirements for a welder"/>
+                </example>
+                <example name="Genadij as a fitter in building 43">
+                    <fieldvalue field="worker" ref="Genadij Bogira"/>
+                    <fieldvalue field="location" ref="At Building 43"/>
+                    <fieldvalue field="occupation">Fitter</fieldvalue>
+                    <fieldvalue field="energyRequirements" ref="Energy requirements for a fitter"/>
+                </example>
+            </examples>
+        </entity>
+        <entity name="Building">
+            <fields>
+                <field name="code" type="String">
+                    <doc>The building code, for example "B 43".</doc>
+                </field>
+                <field name="description" type="String">
+                    <doc>The building description, for example "Assembly shed".</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Building 43">
+                    <fieldvalue field="code">B 43</fieldvalue>
+                    <fieldvalue field="description">Assembly shed</fieldvalue>
+                </example>
+                <example name="Building 44">
+                    <fieldvalue field="code">B 44</fieldvalue>
+                    <fieldvalue field="description">Factory</fieldvalue>
+                </example>
+                <example name="Building 45">
+                    <fieldvalue field="code">B 45</fieldvalue>
+                    <fieldvalue field="description">Paint shop</fieldvalue>
+                </example>
+            </examples>
+        </entity>
+        <entity name="Ship">
+            <fields>
+                <field name="code" type="String">
+                    <doc>The ship code, for example "N 2".</doc>
+                </field>
+                <field name="description" type="String">
+                    <doc>The ship description, for example "Ship 2".</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Ship 2">
+                    <fieldvalue field="code">N 2</fieldvalue>
+                    <fieldvalue field="description">Ship 2</fieldvalue>
+                </example>
+                <example name="Ship 3">
+                    <fieldvalue field="code">R 3</fieldvalue>
+                    <fieldvalue field="description">Ship 3</fieldvalue>
+                </example>
+            </examples>
+        </entity>
+        <entity name="ShipArea">
+            <fields>
+                <field name="code" type="String">
+                    <doc>The ship area code, for example "56".</doc>
+                </field>
+                <field name="description" type="String">
+                    <doc>The ship area description, for example "Cabins".</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Area 56 (Cabins)">
+                    <fieldvalue field="code">56</fieldvalue>
+                    <fieldvalue field="description">Cabins</fieldvalue>
+                </example>
+            </examples>
+        </entity>
+        <valueobject name="Location">
+            <doc>A location always includes a building. It can also optionally include a ship and a ship area.</doc>
+            <fields>
+                <field name="building" ref="Building">
+                    <doc>The building, for example "Building 68".</doc>
+                </field>
+                <field name="ship" ref="Ship" optional="true">
+                    <doc>The ship, for example "Ship 4".</doc>
+                </field>
+                <field name="shipArea" ref="ShipArea" optional="true">
+                    <doc>The ship area, for example "75 (Gallows)".</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="At Building 43">
+                    <fieldvalue field="building" ref="Building 43"/>
+                </example>
+                <example name="At Building 44 / Ship 2">
+                    <fieldvalue field="building" ref="Building 44"/>
+                    <fieldvalue field="ship" ref="Ship 2"/>
+                </example>
+                <example name="At Building 45 / Ship 3 / 56 (Cabins)">
+                    <fieldvalue field="building" ref="Building 45"/>
+                    <fieldvalue field="ship" ref="Ship 3"/>
+                    <fieldvalue field="shipArea" ref="Area 56 (Cabins)"/>
+                </example>
+            </examples>
+        </valueobject>
+        <enumeration name="Occupation">
+            <doc>The task which a worker is performing.</doc>
+            <member>Fitter</member>
+            <member>Welder</member>
+            <member>Pipe fitter</member>
+            <member>Project manager</member>
+            <member>Other</member>
+        </enumeration>
+        <valueobject name="EnergyRequirements">
+            <doc>The "energies" (gases, compressed air, hot works) a worker needs.</doc>
+            <fields>
+                <field name="oxyacetylene" type="Boolean"/>
+                <field name="compositeGas" type="Boolean"/>
+                <field name="argon" type="Boolean"/>
+                <field name="compressedAir" type="Boolean"/>
+                <field name="hotWorks" type="Boolean"/>
+            </fields>
+            <examples>
+                <example name="Energy requirements for a welder">
+                    <fieldvalue field="oxyacetylene">true</fieldvalue>
+                    <fieldvalue field="compositeGas">false</fieldvalue>
+                    <fieldvalue field="argon">true</fieldvalue>
+                    <fieldvalue field="compressedAir">false</fieldvalue>
+                    <fieldvalue field="hotWorks">true</fieldvalue>
+                </example>
+                <example name="Energy requirements for a fitter">
+                    <fieldvalue field="oxyacetylene">false</fieldvalue>
+                    <fieldvalue field="compositeGas">false</fieldvalue>
+                    <fieldvalue field="argon">false</fieldvalue>
+                    <fieldvalue field="compressedAir">true</fieldvalue>
+                    <fieldvalue field="hotWorks">false</fieldvalue>
+                </example>
+            </examples>
+        </valueobject>
+        <enumeration name="NotificationAction">
+            <doc>The possible actions for a LogEntry.</doc>
+            <member>Create</member>
+            <member>Send</member>
+            <member>Approve</member>
+            <member>Reject</member>
+            <member>Edit</member>
+        </enumeration>
+        <entity name="LogEntry">
+            <doc>A logged event in a notification's history.</doc>
+            <fields>
+                <field name="action" ref="NotificationAction"/>
+                <field name="createdAt" type="LocalDateTime"/>
+                <field name="createdBy" ref="User"/>
+            </fields>
+            <examples>
+                <example name="Creation of notification 1">
+                    <fieldvalue field="action">Create</fieldvalue>
+                    <fieldvalue field="createdAt">16.01.2015 21:59</fieldvalue>
+                    <fieldvalue field="createdBy" ref="tero.packalen@yard.com"/>
+                </example>
+                <example name="Sending of notification 1">
+                    <fieldvalue field="action">Send</fieldvalue>
+                    <fieldvalue field="createdAt">16.01.2015 22:05</fieldvalue>
+                    <fieldvalue field="createdBy" ref="tero.packalen@yard.com"/>
+                </example>
+            </examples>
+        </entity>
+    </domaintypes>
+    <aggregates>
+        <aggregate name="NewNotification" rootEntity="Notification" rootHasId="false">
+            <component name="NewWorkEntry" entity="WorkEntry" hasId="false"/>
+            <component name="NewLocation" entity="Location"
+                       hasId="false"/><!-- TODO: entity is a bad attribute name here, it is a value object. also, hasId is redundant. -->
+        </aggregate>
+    </aggregates>
+</domain>

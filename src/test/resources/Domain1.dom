@@ -1,0 +1,76 @@
+entity Person
+  firstName: String
+  lastName: String
+
+entity Contact
+  email: Email
+  phoneNumber: PhoneNumber
+
+entity ContactPerson
+  person: Person
+  contact: Contact
+  role: Role
+
+entity Worker
+  person: Person
+  keyNumber: String
+
+type PhoneNumber = String
+
+type Email = String
+
+data Role = Subcontractor
+          | ArctechEmployee
+          | ProductionManager
+
+entity Building
+  code: String
+  description: String
+
+entity Ship
+  code: String
+
+entity ShipArea
+  code: String
+  description: String
+
+entity Location
+  building: Building
+  ship: Maybe Ship
+  shipArea: Maybe ShipArea
+
+data Occupation = Fitter
+                | Welder
+                | PipeFitter
+                | Other String
+
+entity WorkEntry
+  worker: Worker
+  occupation: Occupation
+  location: Location
+  oxyAcetylene: Boolean
+  compositeGas: Boolean
+  argon: Boolean
+  compressedAir: Boolean
+  hotWorks: Boolean
+
+entity LogEntry
+  createdAt: LocalDateTime
+  createdBy: ContactPerson
+  status: LogEntryStatus
+  comment: String
+
+data LogEntryStatus = Created
+                    | Sent
+                    | Accepted
+                    | Rejected
+
+entity OvertimeNotification
+  createdAt: LocalDateTime
+  createdBy: ContactPerson
+  ahsContact: ContactPerson
+  siteForeman: ContactPerson
+  log: List LogEntry
+  workEntries: List WorkEntry
+  sundayWorkJustification: String
+  additionalInformation: String
