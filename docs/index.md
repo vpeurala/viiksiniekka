@@ -1,2 +1,2 @@
-Sook kook
+Viiksiniekka is a code generator.
 
