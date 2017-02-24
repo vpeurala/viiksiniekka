@@ -1,6 +1,6 @@
-package boilerplatr
+package viiksiniekka
 
-import boilerplatr.extensions._
+import viiksiniekka.extensions._
 import org.scalatest.FunSuite
 
 class Domain1Test extends FunSuite {

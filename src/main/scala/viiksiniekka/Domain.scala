@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 class Domain(domainTypes: Seq[DomainType], aggregates: Seq[Aggregate]) {
   def getDomainTypes: Seq[DomainType] = domainTypes

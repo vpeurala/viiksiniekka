@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 import java.io.{File, FileInputStream, PrintWriter}
 
@@ -59,7 +59,7 @@ object Main {
   }
 
   def printUsage(): Unit = println(
-    s"""Usage: boilerplatr FILE
+    s"""Usage: viiksiniekka FILE
        |
      """.stripMargin)
 

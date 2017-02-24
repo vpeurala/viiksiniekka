@@ -13,7 +13,7 @@ lazy val root = (project in file(".")).
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test",
     libraryDependencies += "junit" % "junit" % "4.12"
   ).
-  settings(mainClass in assembly := Some("boilerplatr.Main"))
+  settings(mainClass in assembly := Some("viiksiniekka.Main"))
 
 // add dependencies on standard Scala modules, in a way
 // supporting cross-version publishing

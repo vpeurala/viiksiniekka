@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 import org.junit.Assert
 import org.junit.Assert.assertEquals

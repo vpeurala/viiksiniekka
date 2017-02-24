@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 object DomainPrettyPrinter {
   def pp(domain: Domain) =

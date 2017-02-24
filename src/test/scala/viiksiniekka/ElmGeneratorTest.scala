@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 import java.io.{File, FileWriter}
 

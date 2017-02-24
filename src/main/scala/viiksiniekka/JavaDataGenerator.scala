@@ -1,6 +1,6 @@
-package boilerplatr
+package viiksiniekka
 
-import boilerplatr.StringUtils.{indent, ordinaryTextToCamelCase, ordinaryTextToConstantCase, upcaseFirst, downcaseFirst}
+import viiksiniekka.StringUtils.{indent, ordinaryTextToCamelCase, ordinaryTextToConstantCase, upcaseFirst, downcaseFirst}
 
 class JavaDataGenerator extends JavaGenerator {
   override def generate(domain: Domain): Map[String, String] = {

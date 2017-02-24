@@ -1,6 +1,6 @@
-package boilerplatr
+package viiksiniekka
 
-import boilerplatr.StringUtils.{downcaseFirst, indent, upcaseFirst}
+import viiksiniekka.StringUtils.{downcaseFirst, indent, upcaseFirst}
 
 class JavaBuilderGenerator extends JavaGenerator {
   override def generate(domain: Domain): Map[String, String] = {

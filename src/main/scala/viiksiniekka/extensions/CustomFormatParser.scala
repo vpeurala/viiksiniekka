@@ -1,6 +1,6 @@
-package boilerplatr.extensions
+package viiksiniekka.extensions
 
-import boilerplatr.extensions.DependencyStyle.DependencyStyle
+import viiksiniekka.extensions.DependencyStyle.DependencyStyle
 import org.parboiled2._
 import shapeless.{::, HNil}
 

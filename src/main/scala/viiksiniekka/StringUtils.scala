@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 object StringUtils {
   def upcaseFirst(s: String): String = {

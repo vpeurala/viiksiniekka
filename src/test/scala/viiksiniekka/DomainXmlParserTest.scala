@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 import org.scalatest.FunSuite
 

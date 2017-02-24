@@ -1,6 +1,6 @@
-package boilerplatr
+package viiksiniekka
 
-import boilerplatr.StringUtils.{camelCaseToSnakeCase, indent}
+import viiksiniekka.StringUtils.{camelCaseToSnakeCase, indent}
 
 class CreateDatabaseSqlGenerator extends Generator {
   def generateSum(d: Domain): String = {

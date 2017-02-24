@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 case class DomainEl(rootPackage: String, domainTypes: Seq[DomainTypeEl], aggregates: Seq[AggregateEl]) {
   override def toString: String = {

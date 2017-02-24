@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 object ProjectStructure {
   val SrcMainJava = "src/main/java"

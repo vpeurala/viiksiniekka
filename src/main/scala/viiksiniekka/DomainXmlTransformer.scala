@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 import scala.collection.mutable
 

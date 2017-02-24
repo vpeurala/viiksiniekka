@@ -1,4 +1,4 @@
-package boilerplatr
+package viiksiniekka
 
 trait JavaGenerator extends Generator {
   def packageDeclaration(p: Package): String = {
