@@ -6,7 +6,11 @@ case class DomainEl(rootPackage: String, domainTypes: Seq[DomainTypeEl], aggrega
   }
 }
 
-sealed trait DomainTypeEl
+sealed trait DomainTypeEl {
+  def name: String
+
+  def doc: String
+}
 
 case class EntityEl(name: String, doc: String, fields: Seq[FieldEl], extends_ : Option[String], examples: Seq[ExampleEl]) extends DomainTypeEl
 
