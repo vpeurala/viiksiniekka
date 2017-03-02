@@ -1,21 +1,53 @@
 package viiksiniekka
 
 import viiksiniekka.StringUtils.{camelCaseToSnakeCase, indent}
+import viiksiniekka.graph.MutableGraph
 
 class CreateDatabaseSqlGenerator extends Generator {
   def generateSum(d: Domain): String = {
-    val topLevelEntities = d.getDomainTypes.filter { p: DomainType =>
+    println("d.getDomainTypes: " + d.getDomainTypes)
+
+    val topLevelEntities: Seq[Entity] = d.getDomainTypes.filter { p: DomainType =>
       p match {
         case e: Entity => isTopLevelEntity(d)(e)
         case _ => false
       }
     }.asInstanceOf[Seq[Entity]]
 
-    topLevelEntities.sortWith { case (e1: Entity, e2: Entity) => topologicalSort(e1, e2) }.map(entitySource(d)).mkString("\n")
+    println("topLevelEntities: " + topLevelEntities.map(_.name).mkString(", "))
+
+    val topSorted: Seq[Entity] = topSort(d)(topLevelEntities)
+
+    println("topSorted: " + topSorted.map(_.name).mkString(", "))
+
+    topSorted.map(entitySource(d)).mkString("\n")
   }
 
-  private def topologicalSort(e1: Entity, e2: Entity): Boolean = {
-    e1.getFields.map(_.getType).contains(e2)
+  private def topSort(d: Domain)(entities: Seq[Entity]): Seq[Entity] = {
+    val dependencyGraph: MutableGraph[String] = new MutableGraph[String]
+    entities.foreach { e => dependencyGraph.addNode(e.name) }
+    entities.foreach { e =>
+      e.getFields.foreach { f =>
+        if (f.getType.isInstanceOf[DomainType]) {
+          dependencyGraph.addEdge(e.name, f.getType.getName)
+        }
+      }
+      d.getDomainTypes.foreach { dt =>
+        dt.getFields.foreach {
+          case l: ListField => {
+            if (l.getType == e) {
+              dependencyGraph.addEdge(e.name, dt.getName)
+            }
+          }
+          case _ => ()
+        }
+      }
+    }
+    dependencyGraph.topSort().reverse.map { n =>
+      d.getDomainTypes.find {
+        _.getName == n
+      }.asInstanceOf[Option[Entity]].get
+    }
   }
 
   override def generate(d: Domain): Map[String, String] = {
