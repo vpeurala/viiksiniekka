@@ -1,6 +1,6 @@
 package viiksiniekka
 
-import java.io.File
+import java.io.{File, FileWriter}
 
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
@@ -70,6 +70,7 @@ class SqlGeneratorTest extends FunSuite with BeforeAndAfterAll {
   test("Can generate sum of table creation sqls correctly in topologically sorted order") {
     val expectedSource: String = readFile("src/test/resources/ddl/V1__Create_Tables_ShipYard.sql")
     val actualSource: String = sqlTableCreationStatementsSum
+    writeFile("src/test/resources/ddl/actual_V1.sql", actualSource)
     assert(expectedSource === actualSource)
   }
 
@@ -81,5 +82,13 @@ class SqlGeneratorTest extends FunSuite with BeforeAndAfterAll {
 
   private def readFile(name: String): String = {
     Source.fromFile(new File(name), "UTF-8").mkString
+  }
+
+  private def writeFile(name: String, content: String): Unit = {
+    val f = new File(name)
+    val fw = new FileWriter(f)
+    fw.write(content)
+    fw.flush()
+    fw.close()
   }
 }

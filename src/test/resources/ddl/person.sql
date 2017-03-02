@@ -5,8 +5,8 @@ CREATE TABLE person (
   company BIGINT REFERENCES company(id),
   contact_information_email VARCHAR,
   contact_information_phone_number VARCHAR,
-  key_code VARCHAR,
   confirmed BOOLEAN,
   token VARCHAR,
-  password VARCHAR
+  password VARCHAR,
+  key_code VARCHAR
 );

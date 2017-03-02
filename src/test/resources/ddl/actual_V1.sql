@@ -16,6 +16,20 @@ CREATE TABLE person (
   key_code VARCHAR
 );
 
+CREATE TABLE log_entry (
+  id BIGSERIAL PRIMARY KEY,
+  action VARCHAR NOT NULL,
+  created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  created_by BIGINT REFERENCES person(id) NOT NULL,
+  notification BIGINT REFERENCES notification(id) NOT NULL
+);
+
+CREATE TABLE ship_area (
+  id BIGSERIAL PRIMARY KEY,
+  code VARCHAR NOT NULL,
+  description VARCHAR NOT NULL
+);
+
 CREATE TABLE building (
   id BIGSERIAL PRIMARY KEY,
   code VARCHAR NOT NULL,
@@ -23,12 +37,6 @@ CREATE TABLE building (
 );
 
 CREATE TABLE ship (
-  id BIGSERIAL PRIMARY KEY,
-  code VARCHAR NOT NULL,
-  description VARCHAR NOT NULL
-);
-
-CREATE TABLE ship_area (
   id BIGSERIAL PRIMARY KEY,
   code VARCHAR NOT NULL,
   description VARCHAR NOT NULL
@@ -69,14 +77,6 @@ CREATE TABLE notification (
   work_week_sunday_start_time_minute INT,
   work_week_sunday_end_time_hour INT,
   work_week_sunday_end_time_minute INT
-);
-
-CREATE TABLE log_entry (
-  id BIGSERIAL PRIMARY KEY,
-  action VARCHAR NOT NULL,
-  created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  created_by BIGINT REFERENCES person(id) NOT NULL,
-  notification BIGINT REFERENCES notification(id) NOT NULL
 );
 
 CREATE TABLE work_entry (

@@ -12,9 +12,15 @@ sealed trait DomainTypeEl {
   def doc: String
 }
 
-case class EntityEl(name: String, doc: String, fields: Seq[FieldEl], extends_ : Option[String], examples: Seq[ExampleEl]) extends DomainTypeEl
+sealed trait DataContainerEl extends DomainTypeEl {
+  def fields: Seq[FieldEl]
 
-case class ValueObjectEl(name: String, doc: String, fields: Seq[FieldEl], extends_ : Option[String], examples: Seq[ExampleEl]) extends DomainTypeEl
+  def extends_ : Option[String]
+}
+
+case class EntityEl(name: String, doc: String, fields: Seq[FieldEl], extends_ : Option[String], examples: Seq[ExampleEl]) extends DataContainerEl
+
+case class ValueObjectEl(name: String, doc: String, fields: Seq[FieldEl], extends_ : Option[String], examples: Seq[ExampleEl]) extends DataContainerEl
 
 case class EnumerationEl(name: String, doc: String, members: Seq[MemberEl]) extends DomainTypeEl
 

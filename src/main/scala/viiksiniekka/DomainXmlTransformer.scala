@@ -1,5 +1,7 @@
 package viiksiniekka
 
+import viiksiniekka.graph.MutableGraph
+
 import scala.collection.mutable
 
 object DomainXmlTransformer {
@@ -16,10 +18,10 @@ object DomainXmlTransformer {
     var typeTable = mutable.LinkedHashMap[String, DomainType]()
     do {
       restart = false
-      domainEl.domainTypes.foreach { domainTypeEl: DomainTypeEl =>
+      val domainTypeEls: Seq[DomainTypeEl] = sortDomainTypes(domainEl.domainTypes)
+      domainTypeEls.foreach { domainTypeEl: DomainTypeEl =>
         if (hasUnsatisfiedDeps(typeTable)(domainTypeEl)) {
-          restart = true
-          numberOfRestarts += 1
+          throw new IllegalStateException(s"Restart on ${domainTypeEl.name}")
         } else {
           typeTable += makeDomainType(domainEl)(typeTable)(domainTypeEl)
         }
@@ -30,6 +32,39 @@ object DomainXmlTransformer {
     } else {
       typeTable.values.toSeq
     }
+  }
+
+  def sortDomainTypes(domainTypes: Seq[DomainTypeEl]): Seq[DomainTypeEl] = {
+    val domainTypeNames: Set[String] = domainTypes.map(_.name).toSet
+    val dependencyGraph: MutableGraph[String] = new MutableGraph[String]
+    domainTypes.foreach {
+      dt => dependencyGraph.addNode(dt.name)
+    }
+    domainTypes.foreach {
+      case d: DataContainerEl => {
+        d.extends_.foreach { ex =>
+          if (domainTypeNames.contains(ex)) {
+            dependencyGraph.addEdge(d.name, ex)
+          }
+        }
+        d.fields.foreach { f =>
+          if (domainTypeNames.contains(f.type_)) {
+            dependencyGraph.addEdge(d.name, f.type_)
+          }
+          // TODO Remove when refs are removed
+          if (domainTypeNames.contains(f.ref)) {
+            dependencyGraph.addEdge(d.name, f.ref)
+          }
+          // TODO Do something smart with list-ref
+          if (f.listRef.nonEmpty && domainTypeNames.contains(f.listRef)) {
+            dependencyGraph.addEdge(d.name, f.listRef)
+          }
+        }
+      }
+      case e: EnumerationEl => ()
+    }
+    val domainTypeNamesInReverseDependencyOrder: Seq[String] = dependencyGraph.topSort.reverse
+    domainTypeNamesInReverseDependencyOrder.map(n => domainTypes.find(_.name == n).get)
   }
 
   private def makeAggregates(domainEl: DomainEl, domainTypes: Seq[DomainType]): Seq[Aggregate] = {
