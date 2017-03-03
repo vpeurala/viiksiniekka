@@ -5,38 +5,39 @@ import viiksiniekka.graph.MutableGraph
 
 class CreateDatabaseSqlGenerator extends Generator {
   def generateSum(d: Domain): String = {
-    println("d.getDomainTypes: " + d.getDomainTypes)
-
     val topLevelEntities: Seq[Entity] = d.getDomainTypes.filter { p: DomainType =>
       p match {
         case e: Entity => isTopLevelEntity(d)(e)
         case _ => false
       }
     }.asInstanceOf[Seq[Entity]]
-
-    println("topLevelEntities: " + topLevelEntities.map(_.name).mkString(", "))
-
     val topSorted: Seq[Entity] = topSort(d)(topLevelEntities)
-
-    println("topSorted: " + topSorted.map(_.name).mkString(", "))
-
     topSorted.map(entitySource(d)).mkString("\n")
   }
 
   private def topSort(d: Domain)(entities: Seq[Entity]): Seq[Entity] = {
     val dependencyGraph: MutableGraph[String] = new MutableGraph[String]
-    entities.foreach { e => dependencyGraph.addNode(e.name) }
+    val tableNames: Seq[String] = entities.map(getTableName)
+    tableNames.foreach { t => dependencyGraph.addNode(t) }
     entities.foreach { e =>
-      e.getFields.foreach { f =>
-        if (f.getType.isInstanceOf[DomainType]) {
-          dependencyGraph.addEdge(e.name, f.getType.getName)
+      def handleField(f: Field): Unit = {
+        f match {
+          case l: ListField => ()
+          case o: OrdinaryField if o.getType.isInstanceOf[DataContainer] =>
+            if (tableNames.contains(getTableName(o.getType.asInstanceOf[DataContainer]))) {
+              dependencyGraph.addEdge(getTableName(e), getTableName(o.getType.asInstanceOf[DataContainer]))
+            }
+            o.getType.asInstanceOf[DataContainer].getFields.foreach(handleField)
+          case _ => ()
         }
       }
+
+      e.getFields.foreach(handleField)
       d.getDomainTypes.foreach { dt =>
         dt.getFields.foreach {
           case l: ListField => {
-            if (l.getType == e) {
-              dependencyGraph.addEdge(e.name, dt.getName)
+            if (l.getType == e && dt.isInstanceOf[DataContainer]) {
+              dependencyGraph.addEdge(getTableName(e), getTableName(dt.asInstanceOf[DataContainer]))
             }
           }
           case _ => ()
@@ -44,8 +45,8 @@ class CreateDatabaseSqlGenerator extends Generator {
       }
     }
     dependencyGraph.topSort().reverse.map { n =>
-      d.getDomainTypes.find {
-        _.getName == n
+      d.getDomainTypes.find { dt =>
+        dt.isInstanceOf[DataContainer] && getTableName(dt.asInstanceOf[DataContainer]) == n
       }.asInstanceOf[Option[Entity]].get
     }
   }

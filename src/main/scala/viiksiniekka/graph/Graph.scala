@@ -13,6 +13,8 @@ class MutableGraph[T] {
   }
 
   def addEdge(from: T, to: T): Unit = {
+    assert(nodes.contains(from), s"Graph does not contain 'from' node ${from} of edge (${from}, ${to}).")
+    assert(nodes.contains(to), s"Graph does not contain 'to' node ${to} of edge (${from}, ${to}).")
     edges += Edge(from, to)
   }
 
@@ -24,7 +26,7 @@ class MutableGraph[T] {
     val nodesWithIncomingEdges: scala.collection.Set[T] =
       edgesTemp.map(_.to).toSet
     var nodesWithoutIncomingEdges: Set[T] =
-      nodes.filter { n => !nodesWithIncomingEdges.contains(n) }
+      nodes.diff(nodesWithIncomingEdges)
     while (nodesWithoutIncomingEdges.nonEmpty) {
       val n: T = nodesWithoutIncomingEdges.head
       nodesWithoutIncomingEdges = nodesWithoutIncomingEdges.tail
@@ -39,7 +41,7 @@ class MutableGraph[T] {
         }
       }
     }
-    assert(result.size == nodes.size, s"Result size ${result.size} was not equal to nodes size ${nodes.size}.")
+    assert(result.size == nodes.size, s"Result size ${result.size} was not equal to nodes size ${nodes.size}, result: ${result}")
     result
   }
 

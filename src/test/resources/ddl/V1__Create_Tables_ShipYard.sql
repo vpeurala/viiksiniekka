@@ -3,20 +3,7 @@ CREATE TABLE company (
   name VARCHAR NOT NULL
 );
 
-CREATE TABLE person (
-  id BIGSERIAL PRIMARY KEY,
-  first_name VARCHAR NOT NULL,
-  last_name VARCHAR NOT NULL,
-  company BIGINT REFERENCES company(id),
-  contact_information_email VARCHAR,
-  contact_information_phone_number VARCHAR,
-  confirmed BOOLEAN,
-  token VARCHAR,
-  password VARCHAR,
-  key_code VARCHAR
-);
-
-CREATE TABLE building (
+CREATE TABLE ship_area (
   id BIGSERIAL PRIMARY KEY,
   code VARCHAR NOT NULL,
   description VARCHAR NOT NULL
@@ -28,10 +15,23 @@ CREATE TABLE ship (
   description VARCHAR NOT NULL
 );
 
-CREATE TABLE ship_area (
+CREATE TABLE building (
   id BIGSERIAL PRIMARY KEY,
   code VARCHAR NOT NULL,
   description VARCHAR NOT NULL
+);
+
+CREATE TABLE person (
+  id BIGSERIAL PRIMARY KEY,
+  first_name VARCHAR NOT NULL,
+  last_name VARCHAR NOT NULL,
+  company BIGINT REFERENCES company(id),
+  contact_information_email VARCHAR,
+  contact_information_phone_number VARCHAR,
+  confirmed BOOLEAN,
+  token VARCHAR,
+  password VARCHAR,
+  key_code VARCHAR
 );
 
 CREATE TABLE notification (
@@ -71,14 +71,6 @@ CREATE TABLE notification (
   work_week_sunday_end_time_minute INT
 );
 
-CREATE TABLE log_entry (
-  id BIGSERIAL PRIMARY KEY,
-  action VARCHAR NOT NULL,
-  created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  created_by BIGINT REFERENCES person(id) NOT NULL,
-  notification BIGINT REFERENCES notification(id) NOT NULL
-);
-
 CREATE TABLE work_entry (
   id BIGSERIAL PRIMARY KEY,
   worker BIGINT REFERENCES person(id) NOT NULL,
@@ -91,5 +83,13 @@ CREATE TABLE work_entry (
   energy_requirements_argon BOOLEAN NOT NULL,
   energy_requirements_compressed_air BOOLEAN NOT NULL,
   energy_requirements_hot_works BOOLEAN NOT NULL,
+  notification BIGINT REFERENCES notification(id) NOT NULL
+);
+
+CREATE TABLE log_entry (
+  id BIGSERIAL PRIMARY KEY,
+  action VARCHAR NOT NULL,
+  created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+  created_by BIGINT REFERENCES person(id) NOT NULL,
   notification BIGINT REFERENCES notification(id) NOT NULL
 );
