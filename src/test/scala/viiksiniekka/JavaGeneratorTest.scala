@@ -1,17 +1,12 @@
 package viiksiniekka
 
-import java.io.File
-
 import org.junit.Assert
 import org.junit.Assert.assertEquals
-import org.scalatest.junit.AssertionsForJUnit
-import org.scalatest.junit.AssertionsForJUnit._
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
-import scala.io.Source
 import scala.xml.{Elem, XML}
 
-class JavaGeneratorTest extends FunSuite with BeforeAndAfterAll {
+class JavaGeneratorTest extends FunSuite with BeforeAndAfterAll with ReadWriteFile {
   var shipYard: Domain = _
   var javaObjects: Map[String, String] = _
   var javaBuilders: Map[String, String] = _
@@ -392,9 +387,5 @@ class JavaGeneratorTest extends FunSuite with BeforeAndAfterAll {
     val xml: Elem = XML.load(getClass.getResourceAsStream("/ShipYard.xml"))
     val domainEl: DomainEl = DomainXmlParser.fromXml(xml)
     DomainXmlTransformer.toDomain(domainEl)
-  }
-
-  private def readFile(name: String): String = {
-    Source.fromFile(new File(name), "UTF-8").mkString
   }
 }

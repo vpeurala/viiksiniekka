@@ -1,13 +1,10 @@
 package viiksiniekka
 
-import java.io.{File, FileWriter}
-
 import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
-import scala.io.Source
 import scala.xml.{Elem, XML}
 
-class ElmGeneratorTest extends FunSuite with BeforeAndAfterAll {
+class ElmGeneratorTest extends FunSuite with BeforeAndAfterAll with ReadWriteFile {
   var shipYard: Domain = _
   var elmFiles: Map[String, String] = _
 
@@ -40,17 +37,5 @@ class ElmGeneratorTest extends FunSuite with BeforeAndAfterAll {
     val xml: Elem = XML.load(getClass.getResourceAsStream("/ShipYard.xml"))
     val domainEl: DomainEl = DomainXmlParser.fromXml(xml)
     DomainXmlTransformer.toDomain(domainEl)
-  }
-
-  private def readFile(name: String): String = {
-    Source.fromFile(new File(name), "UTF-8").mkString
-  }
-
-  private def writeFile(name: String, content: String): Unit = {
-    val f = new File(name)
-    val fw = new FileWriter(f)
-    fw.write(content)
-    fw.flush()
-    fw.close()
   }
 }
