@@ -70,7 +70,6 @@ class SqlGeneratorTest extends FunSuite with BeforeAndAfterAll {
   test("Can generate sum of table creation sqls correctly in topologically sorted order") {
     val expectedSource: String = readFile("src/test/resources/ddl/V1__Create_Tables_ShipYard.sql")
     val actualSource: String = sqlTableCreationStatementsSum
-    writeFile("src/test/resources/ddl/actual_V1.sql", actualSource)
     assert(expectedSource === actualSource)
   }
 
