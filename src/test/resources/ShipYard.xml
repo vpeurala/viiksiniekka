@@ -10,16 +10,16 @@
                 <field name="status" type="NotificationStatus">
                     <doc>The state of the notification.</doc>
                 </field>
-                <field name="yardContact" ref="ContactPerson">
+                <field name="yardContact" type="ContactPerson">
                     <doc>The responsible person about this notification on the yard side.</doc>
                 </field>
-                <field name="siteForeman" ref="ContactPerson">
+                <field name="siteForeman" type="ContactPerson">
                     <doc>The site foreman who is on the premises supervising the work.</doc>
                 </field>
                 <field name="additionalInformation" type="String">
                     <doc>Comments and additional info.</doc>
                 </field>
-                <field name="workWeek" ref="Workweek">
+                <field name="workWeek" type="Workweek">
                     <doc>The working week this notification is about.</doc>
                 </field>
                 <field name="workEntries" list-ref="WorkEntry">
