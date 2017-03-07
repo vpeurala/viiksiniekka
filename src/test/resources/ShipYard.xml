@@ -7,7 +7,7 @@
         <entity name="Notification">
             <doc>A notification about workers and their work hours.</doc>
             <fields>
-                <field name="status" ref="NotificationStatus">
+                <field name="status" type="NotificationStatus">
                     <doc>The state of the notification.</doc>
                 </field>
                 <field name="yardContact" ref="ContactPerson">

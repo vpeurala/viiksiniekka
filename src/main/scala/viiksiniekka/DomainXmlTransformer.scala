@@ -109,7 +109,10 @@ object DomainXmlTransformer {
             optional = field.optional == "true",
             type_ = if (!field.ref.isEmpty) {
               typeTable(field.ref)
-            } else {
+            } else if (typeTable.contains(field.type_)) {
+              typeTable(field.type_)
+            }
+            else {
               field.type_ match {
                 case "String" => StringType
                 case "LocalTime" => LocalTimeType
