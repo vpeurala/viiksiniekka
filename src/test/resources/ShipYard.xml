@@ -97,7 +97,7 @@
             <doc>A person with a company (the person's employer).</doc>
             <extends supertype="Person"/>
             <fields>
-                <field name="company" ref="Company">
+                <field name="company" type="Company">
                     <doc>The company the person works for.</doc>
                 </field>
             </fields>
@@ -127,7 +127,7 @@
             <doc>A person with contact information.</doc>
             <extends supertype="EmployedPerson"/>
             <fields>
-                <field name="contactInformation" ref="ContactInformation"/>
+                <field name="contactInformation" type="ContactInformation"/>
             </fields>
             <examples>
                 <example name="Ville Peurala with contact information">
@@ -203,7 +203,7 @@
                 <field name="lastName" type="String"/>
                 <field name="email" type="String"/>
                 <field name="phoneNumber" type="String"/>
-                <field name="company" ref="Company"/>
+                <field name="company" type="Company"/>
                 <field name="password" type="String"/>
             </fields>
         </valueobject>
@@ -213,13 +213,13 @@
                 <field name="weekNumber" type="Integer">
                     <doc>A ISO week number, minimum is 1, maximum is 53.</doc>
                 </field>
-                <field name="monday" ref="Workday" optional="true"/>
-                <field name="tuesday" ref="Workday" optional="true"/>
-                <field name="wednesday" ref="Workday" optional="true"/>
-                <field name="thursday" ref="Workday" optional="true"/>
-                <field name="friday" ref="Workday" optional="true"/>
-                <field name="saturday" ref="Workday" optional="true"/>
-                <field name="sunday" ref="Workday" optional="true"/>
+                <field name="monday" type="Workday" optional="true"/>
+                <field name="tuesday" type="Workday" optional="true"/>
+                <field name="wednesday" type="Workday" optional="true"/>
+                <field name="thursday" type="Workday" optional="true"/>
+                <field name="friday" type="Workday" optional="true"/>
+                <field name="saturday" type="Workday" optional="true"/>
+                <field name="sunday" type="Workday" optional="true"/>
             </fields>
             <examples>
                 <example name="Week 48">
@@ -233,10 +233,10 @@
         <valueobject name="Workday">
             <doc>The working time of one day.</doc>
             <fields>
-                <field name="startTime" ref="TimeOfDay">
+                <field name="startTime" type="TimeOfDay">
                     <doc>Starting time of the workday without time zone.</doc>
                 </field>
-                <field name="endTime" ref="TimeOfDay">
+                <field name="endTime" type="TimeOfDay">
                     <doc>Ending time of the workday without time zone.</doc>
                 </field>
             </fields>
@@ -295,14 +295,14 @@
         <entity name="WorkEntry">
             <doc>Entry about one worker, his/her location and energy requirements.</doc>
             <fields>
-                <field name="worker" ref="Worker"/>
-                <field name="location" ref="Location">
+                <field name="worker" type="Worker"/>
+                <field name="location" type="Location">
                     <doc>The place where the worker will be working at, for example "Building 5 / Ship 2".</doc>
                 </field>
-                <field name="occupation" ref="Occupation">
+                <field name="occupation" type="Occupation">
                     <doc>The task which the worker will be performing.</doc>
                 </field>
-                <field name="energyRequirements" ref="EnergyRequirements">
+                <field name="energyRequirements" type="EnergyRequirements">
                     <doc>The energies that the worker requires to do his/her job.</doc>
                 </field>
             </fields>
@@ -384,13 +384,13 @@
         <valueobject name="Location">
             <doc>A location always includes a building. It can also optionally include a ship and a ship area.</doc>
             <fields>
-                <field name="building" ref="Building">
+                <field name="building" type="Building">
                     <doc>The building, for example "Building 68".</doc>
                 </field>
-                <field name="ship" ref="Ship" optional="true">
+                <field name="ship" type="Ship" optional="true">
                     <doc>The ship, for example "Ship 4".</doc>
                 </field>
-                <field name="shipArea" ref="ShipArea" optional="true">
+                <field name="shipArea" type="ShipArea" optional="true">
                     <doc>The ship area, for example "75 (Gallows)".</doc>
                 </field>
             </fields>
@@ -454,9 +454,9 @@
         <entity name="LogEntry">
             <doc>A logged event in a notification's history.</doc>
             <fields>
-                <field name="action" ref="NotificationAction"/>
+                <field name="action" type="NotificationAction"/>
                 <field name="createdAt" type="LocalDateTime"/>
-                <field name="createdBy" ref="User"/>
+                <field name="createdBy" type="User"/>
             </fields>
             <examples>
                 <example name="Creation of notification 1">
