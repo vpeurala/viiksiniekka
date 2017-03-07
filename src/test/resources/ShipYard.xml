@@ -22,10 +22,10 @@
                 <field name="workWeek" type="Workweek">
                     <doc>The working week this notification is about.</doc>
                 </field>
-                <field name="workEntries" list-ref="WorkEntry">
+                <field name="workEntries" type="List WorkEntry">
                     <doc>Entries about each worker, his/her location and energy requirements.</doc>
                 </field>
-                <field name="log" list-ref="LogEntry">
+                <field name="log" type="List LogEntry">
                     <doc>All events in the history of the notification.</doc>
                 </field>
             </fields>

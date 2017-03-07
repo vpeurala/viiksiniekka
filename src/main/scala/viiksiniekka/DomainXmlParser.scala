@@ -43,11 +43,9 @@ object DomainXmlParser {
   private def toField(n: Node): FieldEl = {
     val name = (n \ "@name").text
     val type_ = (n \ "@type").text
-    val ref = (n \ "@ref").text
-    val listRef = (n \ "@list-ref").text
     val optional = (n \ "@optional").text
     val doc = (n \ "doc").text
-    FieldEl(name, type_, ref, listRef, optional, doc)
+    FieldEl(name, TypeRef.fromString(type_), optional, doc)
   }
 
   private def toExample(n: Node): ExampleEl = {

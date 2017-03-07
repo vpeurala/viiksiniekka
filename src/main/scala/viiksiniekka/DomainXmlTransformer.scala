@@ -21,7 +21,7 @@ object DomainXmlTransformer {
       val domainTypeEls: Seq[DomainTypeEl] = sortDomainTypes(domainEl.domainTypes)
       domainTypeEls.foreach { domainTypeEl: DomainTypeEl =>
         if (hasUnsatisfiedDeps(typeTable)(domainTypeEl)) {
-          throw new IllegalStateException(s"Restart on ${domainTypeEl.name}")
+          throw new IllegalStateException(s"Restart on ${domainTypeEl.name}. TypeTable at that point was: ${typeTable}")
         } else {
           typeTable += makeDomainType(domainEl)(typeTable)(domainTypeEl)
         }
@@ -48,16 +48,8 @@ object DomainXmlTransformer {
           }
         }
         d.fields.foreach { f =>
-          if (domainTypeNames.contains(f.type_)) {
-            dependencyGraph.addEdge(d.name, f.type_)
-          }
-          // TODO Remove when refs are removed
-          if (domainTypeNames.contains(f.ref)) {
-            dependencyGraph.addEdge(d.name, f.ref)
-          }
-          // TODO Do something smart with list-ref
-          if (f.listRef.nonEmpty && domainTypeNames.contains(f.listRef)) {
-            dependencyGraph.addEdge(d.name, f.listRef)
+          if (domainTypeNames.contains(f.typeRef.baseTypeName)) {
+            dependencyGraph.addEdge(d.name, f.typeRef.baseTypeName)
           }
         }
       }
@@ -75,13 +67,13 @@ object DomainXmlTransformer {
 
   private def hasUnsatisfiedDeps(typeTable: mutable.LinkedHashMap[String, DomainType])(domainTypeEl: DomainTypeEl): Boolean = {
     domainTypeEl match {
-      case EntityEl(_, _, fields, extends_, _) => fields.map(_.ref).exists { ref =>
+      case EntityEl(_, _, fields, extends_, _) => fields.map(_.typeRef.baseTypeName).exists { ref =>
         !ref.isEmpty && !typeTable.isDefinedAt(ref)
       } || (extends_ match {
         case None => false
         case Some(superTypeName) => !typeTable.isDefinedAt(superTypeName)
       })
-      case ValueObjectEl(_, _, fields, extends_, _) => fields.map(_.ref).exists { ref =>
+      case ValueObjectEl(_, _, fields, extends_, _) => fields.map(_.typeRef.baseTypeName).exists { ref =>
         !ref.isEmpty && !typeTable.isDefinedAt(ref)
       } || (extends_ match {
         case None => false
@@ -97,23 +89,21 @@ object DomainXmlTransformer {
   (domainTypeEl: DomainTypeEl): (String, DomainType) = {
     def makeDeclaredFields(fields: Seq[FieldEl]) = {
       fields.map(field => {
-        if (!field.listRef.isEmpty) {
+        if (field.typeRef.isList) {
           ListField(
             name = field.name,
             documentation = field.documentation,
-            type_ = typeTable(field.listRef))
+            type_ = typeTable(field.typeRef.baseTypeName))
         } else {
           OrdinaryField(
             name = field.name,
             documentation = field.documentation,
             optional = field.optional == "true",
-            type_ = if (!field.ref.isEmpty) {
-              typeTable(field.ref)
-            } else if (typeTable.contains(field.type_)) {
-              typeTable(field.type_)
+            type_ = if (typeTable.contains(field.typeRef.baseTypeName)) {
+              typeTable(field.typeRef.baseTypeName)
             }
             else {
-              field.type_ match {
+              field.typeRef.baseTypeName match {
                 case "String" => StringType
                 case "LocalTime" => LocalTimeType
                 case "Boolean" => BooleanType

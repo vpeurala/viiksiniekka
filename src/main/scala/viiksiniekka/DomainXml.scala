@@ -24,7 +24,7 @@ case class ValueObjectEl(name: String, doc: String, fields: Seq[FieldEl], extend
 
 case class EnumerationEl(name: String, doc: String, members: Seq[MemberEl]) extends DomainTypeEl
 
-case class FieldEl(name: String, type_ : String, ref: String, listRef: String, optional: String, documentation: String)
+case class FieldEl(name: String, typeRef: TypeRef, optional: String, documentation: String)
 
 case class MemberEl(name: String)
 
