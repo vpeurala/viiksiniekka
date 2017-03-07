@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="domain" type="domainType"/>
+    <xs:complexType name="entryType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="ref" use="optional"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="componentType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="name" use="optional"/>
+                <xs:attribute type="xs:string" name="entity" use="optional"/>
+                <xs:attribute type="xs:string" name="hasId" use="optional"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="aggregatesType">
+        <xs:sequence>
+            <xs:element type="aggregateType" name="aggregate">
+                <xs:annotation>
+                    <xs:documentation>TODO: entity is a bad attribute name here, it is a value object. also, hasId is
+                        redundant.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="domainType">
+        <xs:sequence>
+            <xs:element type="metaType" name="meta"/>
+            <xs:element type="domaintypesType" name="domaintypes"/>
+            <xs:element type="aggregatesType" name="aggregates"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="entityType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="doc" minOccurs="0"/>
+            <xs:element type="extendsType" name="extends" minOccurs="0"/>
+            <xs:element type="fieldsType" name="fields" minOccurs="0"/>
+            <xs:element type="examplesType" name="examples" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="fieldvalueType" mixed="true">
+        <xs:sequence>
+            <xs:element type="listType" name="list" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="field" use="optional"/>
+        <xs:attribute type="xs:string" name="ref" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="listType">
+        <xs:sequence>
+            <xs:element type="entryType" name="entry" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="aggregateType">
+        <xs:sequence>
+            <xs:element type="componentType" name="component" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name"/>
+        <xs:attribute type="xs:string" name="rootEntity"/>
+        <xs:attribute type="xs:string" name="rootHasId"/>
+    </xs:complexType>
+    <xs:complexType name="exampleType">
+        <xs:sequence>
+            <xs:element type="fieldvalueType" name="fieldvalue" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="enumerationType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="doc" minOccurs="0"/>
+            <xs:element type="xs:string" name="member" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="extendsType" name="extends" minOccurs="0"/>
+            <xs:element type="fieldsType" name="fields" minOccurs="0"/>
+            <xs:element type="examplesType" name="examples" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="examplesType">
+        <xs:sequence>
+            <xs:element type="exampleType" name="example" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="metaType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="rootpackage"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="domaintypesType">
+        <xs:choice maxOccurs="unbounded" minOccurs="0">
+            <xs:element type="entityType" name="entity"/>
+            <xs:element type="enumerationType" name="enumeration"/>
+            <xs:element type="valueobjectType" name="valueobject"/>
+        </xs:choice>
+    </xs:complexType>
+    <xs:complexType name="extendsType">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="supertype" use="optional"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="fieldType" mixed="true">
+        <xs:sequence>
+            <xs:element type="xs:string" name="doc" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+        <xs:attribute type="xs:string" name="type" use="optional"/>
+        <xs:attribute type="xs:string" name="list-ref" use="optional"/>
+        <xs:attribute type="xs:string" name="optional" use="optional"/>
+    </xs:complexType>
+    <xs:complexType name="fieldsType">
+        <xs:sequence>
+            <xs:element type="fieldType" name="field" maxOccurs="unbounded" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="valueobjectType">
+        <xs:sequence>
+            <xs:element type="xs:string" name="doc" minOccurs="0"/>
+            <xs:element type="xs:string" name="member" maxOccurs="unbounded" minOccurs="0"/>
+            <xs:element type="extendsType" name="extends" minOccurs="0"/>
+            <xs:element type="fieldsType" name="fields" minOccurs="0"/>
+            <xs:element type="examplesType" name="examples" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+    </xs:complexType>
+</xs:schema>
