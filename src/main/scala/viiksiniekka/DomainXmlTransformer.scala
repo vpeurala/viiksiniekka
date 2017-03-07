@@ -12,26 +12,12 @@ object DomainXmlTransformer {
   }
 
   private def makeDomainTypes(domainEl: DomainEl): Seq[DomainType] = {
-    val RestartLimit = 1000
-    var restart = false
-    var numberOfRestarts = 0
     var typeTable = mutable.LinkedHashMap[String, DomainType]()
-    do {
-      restart = false
-      val domainTypeEls: Seq[DomainTypeEl] = sortDomainTypes(domainEl.domainTypes)
-      domainTypeEls.foreach { domainTypeEl: DomainTypeEl =>
-        if (hasUnsatisfiedDeps(typeTable)(domainTypeEl)) {
-          throw new IllegalStateException(s"Restart on ${domainTypeEl.name}. TypeTable at that point was: ${typeTable}")
-        } else {
-          typeTable += makeDomainType(domainEl)(typeTable)(domainTypeEl)
-        }
-      }
-    } while (restart && numberOfRestarts < RestartLimit)
-    if (restart) {
-      throw new IllegalStateException(s"The domain could not be stabilized after ${RestartLimit} restarts. Domaintypes with unsatisfied deps: ${domainEl.domainTypes.filter(hasUnsatisfiedDeps(typeTable))}")
-    } else {
-      typeTable.values.toSeq
+    val domainTypeEls: Seq[DomainTypeEl] = sortDomainTypes(domainEl.domainTypes)
+    domainTypeEls.foreach { domainTypeEl: DomainTypeEl =>
+      typeTable += makeDomainType(domainEl)(typeTable)(domainTypeEl)
     }
+    typeTable.values.toSeq
   }
 
   def sortDomainTypes(domainTypes: Seq[DomainTypeEl]): Seq[DomainTypeEl] = {
@@ -62,24 +48,6 @@ object DomainXmlTransformer {
   private def makeAggregates(domainEl: DomainEl, domainTypes: Seq[DomainType]): Seq[Aggregate] = {
     domainEl.aggregates.map { aggregateEl: AggregateEl =>
       makeAggregate(domainEl)(aggregateEl)(domainTypes)
-    }
-  }
-
-  private def hasUnsatisfiedDeps(typeTable: mutable.LinkedHashMap[String, DomainType])(domainTypeEl: DomainTypeEl): Boolean = {
-    domainTypeEl match {
-      case EntityEl(_, _, fields, extends_, _) => fields.map(_.typeRef.baseTypeName).exists { ref =>
-        !ref.isEmpty && !typeTable.isDefinedAt(ref)
-      } || (extends_ match {
-        case None => false
-        case Some(superTypeName) => !typeTable.isDefinedAt(superTypeName)
-      })
-      case ValueObjectEl(_, _, fields, extends_, _) => fields.map(_.typeRef.baseTypeName).exists { ref =>
-        !ref.isEmpty && !typeTable.isDefinedAt(ref)
-      } || (extends_ match {
-        case None => false
-        case Some(superTypeName) => !typeTable.isDefinedAt(superTypeName)
-      })
-      case _: EnumerationEl => false
     }
   }
 
