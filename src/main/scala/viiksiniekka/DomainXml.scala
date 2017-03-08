@@ -1,6 +1,6 @@
 package viiksiniekka
 
-case class DomainEl(rootPackage: String, domainTypes: Seq[DomainTypeEl], aggregates: Seq[AggregateEl]) {
+case class DomainEl(rootPackage: String, domainTypes: Seq[DomainTypeEl], aggregates: Seq[AggregateEl], repositories: Seq[RepositoryEl]) {
   override def toString: String = {
     s"DomainEl(rootPackage: ${rootPackage},\ndomainTypes: ${domainTypes.mkString("\n  ")},\naggregates: ${aggregates.mkString("\n  ")}"
   }
@@ -35,3 +35,11 @@ case class FieldValueEl(field: String, ref: String, value: String)
 case class AggregateEl(name: String, rootEntity: String, rootHasId: Boolean, components: Seq[AggregateComponentEl])
 
 case class AggregateComponentEl(name: String, hasId: Boolean, object_ : String)
+
+case class RepositoryEl(name: String, entity : String, operations: Seq[RepositoryOperationEl])
+
+sealed trait RepositoryOperationEl {
+  def name: String
+}
+
+case class ReadEl(name: String, where: String, orderBy: String) extends RepositoryOperationEl

@@ -478,4 +478,9 @@
             <component name="NewLocation" object="Location" />
         </aggregate>
     </aggregates>
+    <repositories>
+        <repository name="CompanyRepository" entity="Company">
+            <read name="listAll" orderBy="name" />
+        </repository>
+    </repositories>
 </domain>

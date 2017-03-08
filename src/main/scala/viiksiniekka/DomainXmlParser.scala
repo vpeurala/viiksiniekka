@@ -37,7 +37,24 @@ object DomainXmlParser {
         (e \ "component").map(toAggregateComponent)
       )
     }
-    DomainEl(rootpackage, domaintypeobjects, aggregateEls)
+    val repositories: NodeSeq = xml \\ "domain" \ "repositories" \ "_"
+    val repositoryEls: Seq[RepositoryEl] = repositories.map {
+      case r @ <repository>{_*}</repository> => {
+        val reads: NodeSeq = r \ "select"
+        val readEls: Seq[ReadEl] = reads.map(rd => ReadEl(
+          (rd \ "@name").text,
+          (rd \ "@where").text,
+          (rd \ "@orderBy").text
+        ))
+        val operationEls: Seq[RepositoryOperationEl] = readEls
+        RepositoryEl(
+          (r \ "@name").text,
+          (r \ "@entity").text,
+          operationEls
+        )
+      }
+    }
+    DomainEl(rootpackage, domaintypeobjects, aggregateEls, repositoryEls)
   }
 
   private def toField(n: Node): FieldEl = {
