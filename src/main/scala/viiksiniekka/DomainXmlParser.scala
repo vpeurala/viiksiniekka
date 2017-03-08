@@ -40,7 +40,7 @@ object DomainXmlParser {
     val repositories: NodeSeq = xml \\ "domain" \ "repositories" \ "_"
     val repositoryEls: Seq[RepositoryEl] = repositories.map {
       case r @ <repository>{_*}</repository> => {
-        val reads: NodeSeq = r \ "select"
+        val reads: NodeSeq = r \ "read"
         val readEls: Seq[ReadEl] = reads.map(rd => ReadEl(
           (rd \ "@name").text,
           (rd \ "@where").text,

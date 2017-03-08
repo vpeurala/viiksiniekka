@@ -6,7 +6,11 @@ import scala.collection.mutable
 
 object DomainXmlTransformer {
   def toDomain(domainEl: DomainEl): Domain = {
-    val rootPackage = if (domainEl.rootPackage.isEmpty) { PredefPackage } else { OrdinaryPackage(domainEl.rootPackage) }
+    val rootPackage = if (domainEl.rootPackage.isEmpty) {
+      PredefPackage
+    } else {
+      OrdinaryPackage(domainEl.rootPackage)
+    }
     val domainTypes = makeDomainTypes(domainEl)
     val aggregates = makeAggregates(domainEl, domainTypes)
     val repositories = makeRepositories(domainEl, domainTypes, aggregates)
@@ -161,7 +165,7 @@ object DomainXmlTransformer {
 
   def makeRepository(domainEl: DomainEl)(repositoryEl: RepositoryEl)(domainTypes: Seq[DomainType])(aggregates: Seq[Aggregate]): Repository = {
     val operations = repositoryEl.operations.map {
-      case o:ReadEl => ReadRepositoryOperation(o.name, o.where, o.orderBy, typeForRef(domainTypes)(aggregates)(o.output))
+      case o: ReadEl => ReadRepositoryOperation(o.name, o.where, o.orderBy, typeForRef(domainTypes)(aggregates)(o.output))
     }
     Repository(repositoryEl.name, operations)
   }
@@ -174,6 +178,19 @@ object DomainXmlTransformer {
   }
 
   def typeForName(domainTypes: Seq[DomainType])(aggregates: Seq[Aggregate])(name: String): Type = {
-    ???
+    if (builtins.contains(name)) {
+      builtins(name)
+    } else {
+      // TODO vpeurala 8.3.2017: Does not search aggregates yet
+      domainTypes.find(_.getName == name).get
+    }
   }
+
+  def builtins: Map[String, Type] = Map(
+    "String" -> StringType,
+    "LocalTime" -> LocalTimeType,
+    "Boolean" -> BooleanType,
+    "Integer" -> IntegerType,
+    "LocalDateTime" -> LocalDateTimeType
+  )
 }
