@@ -11,7 +11,10 @@ lazy val root = (project in file(".")).
     libraryDependencies += "org.parboiled" %% "parboiled" % "2.1.3",
     libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.1",
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-    libraryDependencies += "junit" % "junit" % "4.12"
+    libraryDependencies += "junit" % "junit" % "4.12" % "test",
+    libraryDependencies += "org.jooq" % "jooq" % "3.9.1" % "test",
+    libraryDependencies += "com.h2database" % "h2" % "1.4.193" % "test",
+    libraryDependencies += "commons-io" % "commons-io" % "2.5" % "test"
   ).
   settings(mainClass in assembly := Some("viiksiniekka.Main"))
 
