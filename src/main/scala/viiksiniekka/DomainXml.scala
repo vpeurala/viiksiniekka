@@ -34,4 +34,4 @@ case class FieldValueEl(field: String, ref: String, value: String)
 
 case class AggregateEl(name: String, rootEntity: String, rootHasId: Boolean, components: Seq[AggregateComponentEl])
 
-case class AggregateComponentEl(name: String, hasId: Boolean, entity: String)
+case class AggregateComponentEl(name: String, hasId: Boolean, object_ : String)

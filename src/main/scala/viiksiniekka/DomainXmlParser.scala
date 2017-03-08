@@ -63,8 +63,16 @@ object DomainXmlParser {
 
   private def toAggregateComponent(n: Node): AggregateComponentEl = {
     val name = (n \ "@name").text
-    val hasId = (n \ "@hasId").text.toBoolean
-    val entity = (n \ "@entity").text
+    val hasId = toBooleanWithDefaultFalse((n \ "@hasId").text)
+    val entity = (n \ "@object").text
     AggregateComponentEl(name, hasId, entity)
+  }
+
+  private def toBooleanWithDefaultFalse(text: String) = {
+    if (text.isEmpty) {
+      false
+    } else {
+      text.toBoolean
+    }
   }
 }

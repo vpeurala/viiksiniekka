@@ -474,9 +474,8 @@
     </domaintypes>
     <aggregates>
         <aggregate name="NewNotification" rootEntity="Notification" rootHasId="false">
-            <component name="NewWorkEntry" entity="WorkEntry" hasId="false"/>
-            <component name="NewLocation" entity="Location"
-                       hasId="false"/><!-- TODO: entity is a bad attribute name here, it is a value object. also, hasId is redundant. -->
+            <component name="NewWorkEntry" object="WorkEntry" hasId="false"/>
+            <component name="NewLocation" object="Location" />
         </aggregate>
     </aggregates>
 </domain>

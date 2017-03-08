@@ -140,8 +140,8 @@ object DomainXmlTransformer {
     }
     val components: Seq[AggregateComponent] = aggregateEl.components.map { componentEl =>
       val name: String = componentEl.name
-      val domainObject: DataContainer = domainTypes.find(dt => dt.getName == componentEl.entity) match {
-        case None => throw new IllegalArgumentException("Domain type not found: '" + componentEl.entity + "'.")
+      val domainObject: DataContainer = domainTypes.find(dt => dt.getName == componentEl.object_) match {
+        case None => throw new IllegalArgumentException("Domain type not found: '" + componentEl.object_ + "'.")
         case Some(d: DataContainer) => d
         case Some(o) => throw new IllegalArgumentException("Domain type of wrong kind: " + o.getClass)
       }
