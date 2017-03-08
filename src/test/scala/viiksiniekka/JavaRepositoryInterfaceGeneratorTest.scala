@@ -13,7 +13,7 @@ class JavaRepositoryInterfaceGeneratorTest extends FunSuite with BeforeAndAfterA
     javaRepositoryInterfaces = new JavaRepositoryInterfaceGenerator().generate(shipYard)
   }
 
-  test("Can generate Person class correctly") {
+  test("Can generate CompanyRepository interface correctly") {
     val expectedSource: String = readFile("src/test/java/com/shipyard/domain/repository/CompanyRepository.java")
     val actualSource: String = javaRepositoryInterfaces("src/main/java/com/shipyard/domain/repository/CompanyRepository.java")
     assert(expectedSource === actualSource)
