@@ -1,11 +1,13 @@
 package viiksiniekka
 
-class Domain(domainTypes: Seq[DomainType], aggregates: Seq[Aggregate], repositories: Seq[Repository]) {
+class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq[Aggregate], repositories: Seq[Repository]) {
   def getDomainTypes: Seq[DomainType] = domainTypes
 
   def getAggregates: Seq[Aggregate] = aggregates
 
   def getRepositories: Seq[Repository] = repositories
+
+  def getRootPackage: Package = rootPackage
 }
 
 trait Nameable {
@@ -42,6 +44,8 @@ sealed trait Package {
   def getExamplePackage: OrdinaryPackage
 
   def getVisitorPackage: OrdinaryPackage
+
+  def getRepositoryPackage: OrdinaryPackage
 }
 
 case class OrdinaryPackage(name: String) extends Package {
@@ -52,6 +56,8 @@ case class OrdinaryPackage(name: String) extends Package {
   override def getExamplePackage = OrdinaryPackage(name = name + ".domain.example")
 
   override def getVisitorPackage = OrdinaryPackage(name = name + ".domain.visitor")
+
+  override def getRepositoryPackage = OrdinaryPackage(name = name + ".domain.repository")
 }
 
 case object PredefPackage extends Package {
@@ -62,6 +68,8 @@ case object PredefPackage extends Package {
   override def getExamplePackage = OrdinaryPackage(name = "domain.example")
 
   override def getVisitorPackage = OrdinaryPackage(name = "domain.visitor")
+
+  override def getRepositoryPackage = OrdinaryPackage(name = "domain.repository")
 }
 
 sealed trait Type extends Nameable with HasPackage

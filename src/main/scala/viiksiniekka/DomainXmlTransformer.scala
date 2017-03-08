@@ -6,10 +6,11 @@ import scala.collection.mutable
 
 object DomainXmlTransformer {
   def toDomain(domainEl: DomainEl): Domain = {
+    val rootPackage = if (domainEl.rootPackage.isEmpty) { PredefPackage } else { OrdinaryPackage(domainEl.rootPackage) }
     val domainTypes = makeDomainTypes(domainEl)
     val aggregates = makeAggregates(domainEl, domainTypes)
     val repositories = makeRepositories(domainEl, domainTypes, aggregates)
-    new Domain(domainTypes, aggregates, repositories)
+    new Domain(rootPackage, domainTypes, aggregates, repositories)
   }
 
   private def makeDomainTypes(domainEl: DomainEl): Seq[DomainType] = {
