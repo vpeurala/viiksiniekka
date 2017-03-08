@@ -479,8 +479,8 @@
         </aggregate>
     </aggregates>
     <repositories>
-        <repository name="CompanyRepository" entity="Company">
-            <read name="listAll" orderBy="name" />
+        <repository name="CompanyRepository">
+            <read name="listAll" orderBy="name" output="List Company" />
         </repository>
     </repositories>
 </domain>

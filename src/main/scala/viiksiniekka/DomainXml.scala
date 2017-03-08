@@ -36,10 +36,10 @@ case class AggregateEl(name: String, rootEntity: String, rootHasId: Boolean, com
 
 case class AggregateComponentEl(name: String, hasId: Boolean, object_ : String)
 
-case class RepositoryEl(name: String, entity : String, operations: Seq[RepositoryOperationEl])
+case class RepositoryEl(name: String, operations: Seq[RepositoryOperationEl])
 
 sealed trait RepositoryOperationEl {
   def name: String
 }
 
-case class ReadEl(name: String, where: String, orderBy: String) extends RepositoryOperationEl
+case class ReadEl(name: String, where: String, orderBy: String, output: TypeRef) extends RepositoryOperationEl

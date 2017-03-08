@@ -1,9 +1,11 @@
 package viiksiniekka
 
-class Domain(domainTypes: Seq[DomainType], aggregates: Seq[Aggregate]) {
+class Domain(domainTypes: Seq[DomainType], aggregates: Seq[Aggregate], repositories: Seq[Repository]) {
   def getDomainTypes: Seq[DomainType] = domainTypes
 
   def getAggregates: Seq[Aggregate] = aggregates
+
+  def getRepositories: Seq[Repository] = repositories
 }
 
 trait Nameable {
@@ -106,6 +108,15 @@ case object LocalDateTimeType extends Type {
   override def getName: String = "LocalDateTime"
 
   override def getPackage: Package = OrdinaryPackage("java.time")
+}
+
+// TODO vpeurala 8.3.2017: The correct implementation of
+// getName and getPackage is a little unclear;
+// currently they just delegate to the contained type
+case class ListType(containedType: Type) extends Type {
+  override def getName: String = containedType.getName
+
+  override def getPackage: Package = containedType.getPackage
 }
 
 sealed trait DataContainer extends DomainType {
@@ -370,3 +381,11 @@ case class Aggregate(name: String, documentation: String, package_ : Package, ro
 }
 
 case class AggregateComponent(name: String, documentation: String, dataContainer: DataContainer, hasId: Boolean)
+
+case class Repository(name: String, operations: Seq[RepositoryOperation])
+
+sealed trait RepositoryOperation {
+  def name: String
+}
+
+case class ReadRepositoryOperation(name: String, where: String, orderBy: String, output: Type) extends RepositoryOperation

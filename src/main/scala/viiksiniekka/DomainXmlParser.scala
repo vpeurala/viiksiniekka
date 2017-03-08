@@ -44,12 +44,12 @@ object DomainXmlParser {
         val readEls: Seq[ReadEl] = reads.map(rd => ReadEl(
           (rd \ "@name").text,
           (rd \ "@where").text,
-          (rd \ "@orderBy").text
+          (rd \ "@orderBy").text,
+          TypeRef.fromString((rd \ "@output").text)
         ))
         val operationEls: Seq[RepositoryOperationEl] = readEls
         RepositoryEl(
           (r \ "@name").text,
-          (r \ "@entity").text,
           operationEls
         )
       }

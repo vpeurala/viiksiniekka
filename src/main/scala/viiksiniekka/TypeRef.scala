@@ -8,13 +8,13 @@ sealed trait TypeRef {
   def baseTypeName: String
 }
 
-class SimpleTypeRef(val baseTypeName: String) extends TypeRef {
+case class SimpleTypeRef(baseTypeName: String) extends TypeRef {
   override def isSimple: Boolean = true
 
   override def isList: Boolean = false
 }
 
-class ListTypeRef(val baseTypeName: String) extends TypeRef {
+case class ListTypeRef(baseTypeName: String) extends TypeRef {
   override def isSimple: Boolean = false
 
   override def isList: Boolean = true
@@ -23,9 +23,9 @@ class ListTypeRef(val baseTypeName: String) extends TypeRef {
 object TypeRef {
   def fromString(input: String): TypeRef = {
     if (input.startsWith("List")) {
-      new ListTypeRef(input.substring("List ".length))
+      ListTypeRef(input.substring("List ".length))
     } else {
-      new SimpleTypeRef(input)
+      SimpleTypeRef(input)
     }
   }
 }

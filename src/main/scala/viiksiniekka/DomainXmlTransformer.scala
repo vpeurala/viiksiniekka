@@ -8,7 +8,8 @@ object DomainXmlTransformer {
   def toDomain(domainEl: DomainEl): Domain = {
     val domainTypes = makeDomainTypes(domainEl)
     val aggregates = makeAggregates(domainEl, domainTypes)
-    new Domain(domainTypes, aggregates)
+    val repositories = makeRepositories(domainEl, domainTypes, aggregates)
+    new Domain(domainTypes, aggregates, repositories)
   }
 
   private def makeDomainTypes(domainEl: DomainEl): Seq[DomainType] = {
@@ -48,6 +49,12 @@ object DomainXmlTransformer {
   private def makeAggregates(domainEl: DomainEl, domainTypes: Seq[DomainType]): Seq[Aggregate] = {
     domainEl.aggregates.map { aggregateEl: AggregateEl =>
       makeAggregate(domainEl)(aggregateEl)(domainTypes)
+    }
+  }
+
+  private def makeRepositories(domainEl: DomainEl, domainTypes: Seq[DomainType], aggregates: Seq[Aggregate]) = {
+    domainEl.repositories.map { repositoryEl: RepositoryEl =>
+      makeRepository(domainEl)(repositoryEl)(domainTypes)(aggregates)
     }
   }
 
@@ -149,5 +156,23 @@ object DomainXmlTransformer {
     }
     Aggregate(aggregateEl.name, documentation = "TODO: docs missing", // TODO: docs missing
       package_ = OrdinaryPackage(domainEl.rootPackage), rootEntity, rootHasId = aggregateEl.rootHasId, components)
+  }
+
+  def makeRepository(domainEl: DomainEl)(repositoryEl: RepositoryEl)(domainTypes: Seq[DomainType])(aggregates: Seq[Aggregate]): Repository = {
+    val operations = repositoryEl.operations.map {
+      case o:ReadEl => ReadRepositoryOperation(o.name, o.where, o.orderBy, typeForRef(domainTypes)(aggregates)(o.output))
+    }
+    Repository(repositoryEl.name, operations)
+  }
+
+  def typeForRef(domainTypes: Seq[DomainType])(aggregates: Seq[Aggregate])(typeRef: TypeRef): Type = {
+    typeRef match {
+      case SimpleTypeRef(name) => typeForName(domainTypes)(aggregates)(name)
+      case ListTypeRef(name) => ListType(typeForName(domainTypes)(aggregates)(name))
+    }
+  }
+
+  def typeForName(domainTypes: Seq[DomainType])(aggregates: Seq[Aggregate])(name: String): Type = {
+    ???
   }
 }
