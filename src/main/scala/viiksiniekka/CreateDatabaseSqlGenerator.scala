@@ -117,7 +117,7 @@ class CreateDatabaseSqlGenerator extends Generator {
       case (name_, optional_, LocalTimeType) => s"${camelCaseToSnakeCase(name_)} TIME WITHOUT TIME ZONE${notNull(optional_)}"
       case (name_, optional_, LocalDateTimeType) => s"${camelCaseToSnakeCase(name_)} TIMESTAMP WITHOUT TIME ZONE${notNull(optional_)}"
       case (name_, optional_, e: Enumeration) => s"${camelCaseToSnakeCase(name_)} VARCHAR${notNull(optional_)}"
-      case (name_, optional_, e: Entity) => s"${camelCaseToSnakeCase(name_)} BIGINT REFERENCES ${getTableName(e)}(id)${notNull(optional_)}"
+      case (name_, optional_, e: Entity) => s"${camelCaseToSnakeCase(name_)} BIGINT${notNull(optional_)} REFERENCES ${getTableName(e)}(id)"
       case (name_, optional_, v: ValueObject) => (
         v.getFields.flatMap {
           case of: OrdinaryField => Some(embed(domain)(name_ + "_" + of.getName, optional_ || of.isOptional, of.getType))
@@ -144,7 +144,7 @@ class CreateDatabaseSqlGenerator extends Generator {
         case ListField(_, _, type_) => type_ == manySide
         case _ => false
       }) match {
-        case Some(p: DataContainer) => s"${getTableName(p)} BIGINT REFERENCES ${getTableName(p)}(id) NOT NULL"
+        case Some(p: DataContainer) => s"${getTableName(p)} BIGINT NOT NULL REFERENCES ${getTableName(p)}(id)"
         case None => ""
       }
     } else {

@@ -37,8 +37,8 @@ CREATE TABLE person (
 CREATE TABLE notification (
   id BIGSERIAL PRIMARY KEY,
   status VARCHAR NOT NULL,
-  yard_contact BIGINT REFERENCES person(id) NOT NULL,
-  site_foreman BIGINT REFERENCES person(id) NOT NULL,
+  yard_contact BIGINT NOT NULL REFERENCES person(id),
+  site_foreman BIGINT NOT NULL REFERENCES person(id),
   additional_information VARCHAR NOT NULL,
   work_week_week_number INT NOT NULL,
   work_week_monday_start_time_hour INT,
@@ -73,8 +73,8 @@ CREATE TABLE notification (
 
 CREATE TABLE work_entry (
   id BIGSERIAL PRIMARY KEY,
-  worker BIGINT REFERENCES person(id) NOT NULL,
-  location_building BIGINT REFERENCES building(id) NOT NULL,
+  worker BIGINT NOT NULL REFERENCES person(id),
+  location_building BIGINT NOT NULL REFERENCES building(id),
   location_ship BIGINT REFERENCES ship(id),
   location_ship_area BIGINT REFERENCES ship_area(id),
   occupation VARCHAR NOT NULL,
@@ -83,13 +83,13 @@ CREATE TABLE work_entry (
   energy_requirements_argon BOOLEAN NOT NULL,
   energy_requirements_compressed_air BOOLEAN NOT NULL,
   energy_requirements_hot_works BOOLEAN NOT NULL,
-  notification BIGINT REFERENCES notification(id) NOT NULL
+  notification BIGINT NOT NULL REFERENCES notification(id)
 );
 
 CREATE TABLE log_entry (
   id BIGSERIAL PRIMARY KEY,
   action VARCHAR NOT NULL,
   created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-  created_by BIGINT REFERENCES person(id) NOT NULL,
-  notification BIGINT REFERENCES notification(id) NOT NULL
+  created_by BIGINT NOT NULL REFERENCES person(id),
+  notification BIGINT NOT NULL REFERENCES notification(id)
 );

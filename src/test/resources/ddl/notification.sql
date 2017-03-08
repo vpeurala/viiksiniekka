@@ -1,8 +1,8 @@
 CREATE TABLE notification (
   id BIGSERIAL PRIMARY KEY,
   status VARCHAR NOT NULL,
-  yard_contact BIGINT REFERENCES person(id) NOT NULL,
-  site_foreman BIGINT REFERENCES person(id) NOT NULL,
+  yard_contact BIGINT NOT NULL REFERENCES person(id),
+  site_foreman BIGINT NOT NULL REFERENCES person(id),
   additional_information VARCHAR NOT NULL,
   work_week_week_number INT NOT NULL,
   work_week_monday_start_time_hour INT,

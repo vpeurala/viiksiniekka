@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -19,12 +20,15 @@ public class JdbcCompanyRepositoryTest {
     @Before
     public void setUp() throws Exception {
         JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setUrl("jdbc:h2:mem:;TRACE_LEVEL_SYSTEM_OUT=3");
+        dataSource.setUrl("jdbc:h2:mem:shipyard");
         String ddl = stringResource("/ddl/V1__Create_Tables_ShipYard.sql");
         String[] statements = ddl.split(";");
-        for (String statement : statements) {
-            dataSource.getConnection().createStatement().execute(statement.trim());
-            System.out.println("Executed SQL statement: '" + statement.trim() + "'.");
+        Connection connection = dataSource.getConnection();
+        for (String originalStatement : statements) {
+            // Note: TIMESTAMP WITHOUT TIME ZONE is a PostgreSQL datatype, the equivalent H2 datatype is just simple TIMESTAMP.
+            String modifiedStatement = originalStatement.trim().replaceAll("TIMESTAMP WITHOUT TIME ZONE", "TIMESTAMP");
+            connection.createStatement().execute(modifiedStatement);
+            System.out.println("Executed SQL statement: '" + modifiedStatement + "'.");
         }
         repository = new JdbcCompanyRepository(dataSource);
     }
