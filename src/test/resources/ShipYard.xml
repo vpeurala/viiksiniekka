@@ -180,7 +180,7 @@
             <examples>
                 <example name="ville.peurala@gmail.com">
                     <fieldvalue field="firstName">Ville</fieldvalue>
-                    <fieldvalue field="lastName">Ville</fieldvalue>
+                    <fieldvalue field="lastName">Peurala</fieldvalue>
                     <fieldvalue field="company" ref="STX Group"/>
                     <fieldvalue field="contactInformation" ref="Contact information for Ville Peurala"/>
                     <fieldvalue field="confirmed">true</fieldvalue>

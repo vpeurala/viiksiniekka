@@ -77,7 +77,7 @@ class InsertExamplesSqlGenerator extends Generator {
   }
 
   private def sourceFileName(name: String): String = {
-    ProjectStructure.SrcMainResources + "/ddl/" + camelCaseToSnakeCase(name) + ".sql"
+    ProjectStructure.SrcMainResources + "/ddl/" + camelCaseToSnakeCase(name) + "_insert.sql"
   }
 
   def isSubclassOfDeep(d: Domain)(parent: DataContainer, child: DataContainer): Boolean = {
@@ -168,7 +168,7 @@ class InsertExamplesSqlGenerator extends Generator {
   }
 
   def entitySource(d: Domain)(e: DataContainer): String =
-    s"""CREATE TABLE ${getTableName(e)} (
+    s"""INSERT INTO ${getTableName(e)} (
        |${
       getColumns(d)(e).map(indent(2)).mkString(",\n")
     }
