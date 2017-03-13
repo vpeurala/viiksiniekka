@@ -4,7 +4,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite}
 
 import scala.xml.{Elem, XML}
 
-class InsertsSqlGeneratorTest extends FunSuite with BeforeAndAfterAll with ReadWriteFile {
+class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll with ReadWriteFile {
   var shipYard: Domain = _
   var sqlTableCreationStatements: Map[String, String] = _
   var sqlTableCreationStatementsSum: String = _
