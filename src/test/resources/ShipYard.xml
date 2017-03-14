@@ -132,7 +132,7 @@
             <examples>
                 <example name="Ville Peurala with contact information">
                     <fieldvalue field="firstName">Ville</fieldvalue>
-                    <fieldvalue field="lastName">Ville</fieldvalue>
+                    <fieldvalue field="lastName">Peurala</fieldvalue>
                     <fieldvalue field="contactInformation" ref="Contact information for Ville Peurala"/>
                 </example>
                 <example name="Tero Packalen with contact information">
