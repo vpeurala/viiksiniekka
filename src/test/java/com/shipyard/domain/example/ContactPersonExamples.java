@@ -6,7 +6,7 @@ public class ContactPersonExamples {
     public static ContactPersonBuilder villePeuralaWithContactInformation() {
         return new ContactPersonBuilder()
                 .withFirstName("Ville")
-                .withLastName("Ville")
+                .withLastName("Peurala")
                 .withContactInformation(ContactInformationExamples.contactInformationForVillePeurala());
     }
 

@@ -6,7 +6,7 @@ public class UserExamples {
     public static UserBuilder villePeuralaGmailCom() {
         return new UserBuilder()
                 .withFirstName("Ville")
-                .withLastName("Ville")
+                .withLastName("Peurala")
                 .withCompany(CompanyExamples.sTXGroup())
                 .withContactInformation(ContactInformationExamples.contactInformationForVillePeurala())
                 .withConfirmed(true)
