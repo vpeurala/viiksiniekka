@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -21,7 +22,14 @@ public class JdbcCompanyRepositoryTest {
     public void setUp() throws Exception {
         JdbcDataSource dataSource = new JdbcDataSource();
         dataSource.setUrl("jdbc:h2:mem:shipyard");
-        String ddl = stringResource("/ddl/V1__Create_Tables_ShipYard.sql");
+        String ddl1 = stringResource("/ddl/V1__Create_Tables_ShipYard.sql");
+        executeDdl(dataSource, ddl1);
+        String ddl2 = stringResource("/ddl/company_insert.sql");
+        executeDdl(dataSource, ddl2);
+        repository = new JdbcCompanyRepository(dataSource);
+    }
+
+    private void executeDdl(JdbcDataSource dataSource, String ddl) throws SQLException {
         String[] statements = ddl.split(";");
         Connection connection = dataSource.getConnection();
         for (String originalStatement : statements) {
@@ -30,7 +38,6 @@ public class JdbcCompanyRepositoryTest {
             connection.createStatement().execute(modifiedStatement);
             System.out.println("Executed SQL statement: '" + modifiedStatement + "'.");
         }
-        repository = new JdbcCompanyRepository(dataSource);
     }
 
     @Test

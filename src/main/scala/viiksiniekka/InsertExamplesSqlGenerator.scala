@@ -138,40 +138,58 @@ class InsertExamplesSqlGenerator extends Generator {
     })
   }
 
-  def getOneSideOfListRelation(d: Domain)(manySide: DataContainer): String = {
+  def getOneSideOfListRelation(d: Domain)(manySide: DataContainer): Option[Column] = {
     if (isOnManySideOfListRelation(d)(manySide)) {
       d.getDomainTypes.find(p => p.getDeclaredFields.exists {
         case ListField(_, _, type_) => type_ == manySide
         case _ => false
       }) match {
-        case Some(p: DataContainer) => s"${getTableName(p)} BIGINT NOT NULL REFERENCES ${getTableName(p)}(id)"
-        case None => ""
+        case Some(p: DataContainer) => Some(Column(getTableName(p), SqlType("BIGINT"), true, false, foreignKeyConstraint = Option.empty))
+        case None => None
       }
     } else {
-      ""
+      None
     }
   }
 
-  def getColumns(d: Domain)(e: DataContainer): Seq[String] = e.getFields.flatMap {
-    case of: OrdinaryField => Some(embed(d)(of.getName, of.isOptional, of.getType))
+  def getColumns(d: Domain)(e: DataContainer): Seq[Column] = e.getFields.flatMap {
+    case of: OrdinaryField => Some(Column(of.getName, sqlType(of), of.isOptional, of.name == "id", foreignKeyConstraint = Option.empty))
     case _: ListField => None
   } ++
     getSubclassFields(d)(e).flatMap {
-      case of: OrdinaryField => Some(embed(d)(of.getName, optional = true, of.getType))
+      case of: OrdinaryField => Some(Column(of.getName, sqlType(of), of.isOptional, of.name == "id", foreignKeyConstraint = Option.empty))
       case _: ListField => None
     } ++ {
     if (isOnManySideOfListRelation(d)(e)) {
-      Seq(getOneSideOfListRelation(d)(e))
+      getOneSideOfListRelation(d)(e) match {
+        case Some(column) => Seq(column)
+        case None => Seq()
+      }
     } else {
       Seq()
     }
   }
 
+  def sqlType(of: OrdinaryField): SqlType = SqlType(of.type_ match {
+    case BooleanType => "BOOLEAN"
+    case IntegerType => "INT"
+    case LongType => "BIGINT"
+    case StringType => "VARCHAR"
+    case LocalDateTimeType => "TIMESTAMP WITHOUT TIME ZONE"
+    case _: DomainType => "BIGINT"
+  })
+
   def entitySource(d: Domain)(e: DataContainer): String =
     s"""INSERT INTO ${getTableName(e)} (
-       |${
-      getColumns(d)(e).map(indent(2)).mkString(",\n")
-    }
-       |);
+       |${indent(2)(getColumns(d)(e).filter(!_.isPrimaryKey).map(_.name).mkString(",\n"))}
+       |) VALUES ${e.getExamples.map(exampleToInsertValuesGroup).map(g => s"(\n  ${g}\n)").mkString(", ")};
        |""".stripMargin
+
+  def exampleToInsertValuesGroup(example: Example): String = {
+    example.fieldValues.map {
+      case SimpleFieldValue(field: Field, v: String) if field.getType == StringType => s"'${v}'"
+      case SimpleFieldValue(field: Field, v: String) => v
+      case ReferenceFieldValue(field: Field, ref: String) => ref
+    }.mkString(", ")
+  }
 }

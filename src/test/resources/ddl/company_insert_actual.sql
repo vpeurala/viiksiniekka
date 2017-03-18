@@ -1,4 +1,0 @@
-INSERT INTO company (
-  id BIGSERIAL PRIMARY KEY,
-  name VARCHAR NOT NULL
-);
