@@ -482,5 +482,8 @@
         <repository name="CompanyRepository">
             <read name="listAll" orderBy="name" output="List Company" />
         </repository>
+        <repository name="BuildingRepository">
+            <read name="listAll" orderBy="code" output="List Building" />
+        </repository>
     </repositories>
 </domain>

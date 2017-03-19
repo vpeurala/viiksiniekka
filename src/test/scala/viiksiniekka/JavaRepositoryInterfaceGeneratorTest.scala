@@ -19,6 +19,12 @@ class JavaRepositoryInterfaceGeneratorTest extends FunSuite with BeforeAndAfterA
     assert(expectedSource === actualSource)
   }
 
+  test("Can generate BuildingRepository interface correctly") {
+    val expectedSource: String = readFile("src/test/java/com/shipyard/domain/repository/BuildingRepository.java")
+    val actualSource: String = javaRepositoryInterfaces("src/main/java/com/shipyard/domain/repository/BuildingRepository.java")
+    assert(expectedSource === actualSource)
+  }
+
   private def createShipYard: Domain = {
     val xml: Elem = XML.load(getClass.getResourceAsStream("/ShipYard.xml"))
     val domainEl: DomainEl = DomainXmlParser.fromXml(xml)
