@@ -190,6 +190,6 @@ class InsertExamplesSqlGenerator extends Generator {
       case SimpleFieldValue(field: Field, v: String) if field.getType == StringType => s"'${v}'"
       case SimpleFieldValue(field: Field, v: String) => v
       case ReferenceFieldValue(field: Field, ref: String) => ref
-    }.mkString(", ")
+    }.mkString(",\n  ")
   }
 }
