@@ -153,11 +153,11 @@ class InsertExamplesSqlGenerator extends Generator {
   }
 
   def getColumns(d: Domain)(e: DataContainer): Seq[Column] = e.getFields.flatMap {
-    case of: OrdinaryField => Some(Column(of.getName, sqlType(of), of.isOptional, of.name == "id", foreignKeyConstraint = Option.empty))
+    case of: OrdinaryField => Some(Column(camelCaseToSnakeCase(of.getName), sqlType(of), of.isOptional, of.name == "id", foreignKeyConstraint = Option.empty))
     case _: ListField => None
   } ++
     getSubclassFields(d)(e).flatMap {
-      case of: OrdinaryField => Some(Column(of.getName, sqlType(of), of.isOptional, of.name == "id", foreignKeyConstraint = Option.empty))
+      case of: OrdinaryField => Some(Column(camelCaseToSnakeCase(of.getName), sqlType(of), of.isOptional, of.name == "id", foreignKeyConstraint = Option.empty))
       case _: ListField => None
     } ++ {
     if (isOnManySideOfListRelation(d)(e)) {
@@ -179,17 +179,25 @@ class InsertExamplesSqlGenerator extends Generator {
     case _: DomainType => "BIGINT"
   })
 
-  def entitySource(d: Domain)(e: DataContainer): String =
-    s"""INSERT INTO ${getTableName(e)} (
-       |${indent(2)(getColumns(d)(e).filter(!_.isPrimaryKey).map(_.name).mkString(",\n"))}
-       |) VALUES ${e.getExamples.map(exampleToInsertValuesGroup).map(g => s"(\n  ${g}\n)").mkString(", ")};
+  def entitySource(d: Domain)(e: DataContainer): String = {
+    val table: Table = Table(getTableName(e), getColumns(d)(e))
+    s"""INSERT INTO ${table.name} (
+       |${indent(2)(table.columns.filter(!_.isPrimaryKey).map(_.name).mkString(",\n"))}
+       |) VALUES ${e.getExamples.map(exampleToInsertValuesGroup(table)).map(g => s"(\n  ${g}\n)").mkString(", ")};
        |""".stripMargin
+  }
 
-  def exampleToInsertValuesGroup(example: Example): String = {
-    example.fieldValues.map {
-      case SimpleFieldValue(field: Field, v: String) if field.getType == StringType => s"'${v}'"
-      case SimpleFieldValue(field: Field, v: String) => v
-      case ReferenceFieldValue(field: Field, ref: String) => ref
-    }.mkString(",\n  ")
+  def exampleToInsertValuesGroup(table: Table)(example: Example): String = {
+    table.columns.flatMap(column => {
+      if (column.isPrimaryKey) {
+        Seq()
+      } else Seq(
+        example.fieldValues.find(fv => camelCaseToSnakeCase(fv.getField.getName) == column.name) match {
+          case None => "NULL"
+          case Some(SimpleFieldValue(field: Field, v: String)) if field.getType == StringType => s"'${v}'"
+          case Some(SimpleFieldValue(field: Field, v: String)) => v
+          case Some(ReferenceFieldValue(field: Field, ref: String)) => ref
+        })
+    }).mkString(",\n  ")
   }
 }

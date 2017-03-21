@@ -28,6 +28,12 @@ class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
     assert(expectedSource === actualSource)
   }
 
+  test("Can generate person table test data insertion sql correctly") {
+    //val expectedSource: String = readFile("src/test/resources/ddl/person_insert.sql")
+    val actualSource: String = sqlInserts("src/main/resources/ddl/person_insert.sql")
+    writeFile("src/test/resources/ddl/person_insert.sql", actualSource)
+  }
+
   private def createShipYard: Domain = {
     val xml: Elem = XML.load(getClass.getResourceAsStream("/ShipYard.xml"))
     val domainEl: DomainEl = DomainXmlParser.fromXml(xml)
