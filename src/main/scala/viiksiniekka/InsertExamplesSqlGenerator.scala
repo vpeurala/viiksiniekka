@@ -121,11 +121,11 @@ class InsertExamplesSqlGenerator extends Generator {
   }
 
   def getColumns(d: Domain)(e: DataContainer): Seq[Column] = e.getFields.flatMap {
-    case of: OrdinaryField => Some(Column(camelCaseToSnakeCase(of.getName), sqlType(of), !of.isOptional, of.name == "id", foreignKeyConstraint = Option.empty))
+    case of: OrdinaryField => Some(Column(camelCaseToSnakeCase(of.getName), sqlType(of), !of.isOptional, of.name == "id", foreignKeyConstraint = Option.empty)) // TODO missing constraint
     case _: ListField => None
   } ++
     getSubclassFields(d)(e).flatMap {
-      case of: OrdinaryField => Some(Column(camelCaseToSnakeCase(of.getName), sqlType(of), notNull = false, isPrimaryKey = of.name == "id", foreignKeyConstraint = Option.empty))
+      case of: OrdinaryField => Some(Column(camelCaseToSnakeCase(of.getName), sqlType(of), notNull = false, isPrimaryKey = of.name == "id", foreignKeyConstraint = Option.empty)) // TODO missing constraint
       case _: ListField => None
     } ++ {
     if (isOnManySideOfListRelation(d)(e)) {
