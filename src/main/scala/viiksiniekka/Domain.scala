@@ -8,6 +8,12 @@ class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq
   def getRepositories: Seq[Repository] = repositories
 
   def getRootPackage: Package = rootPackage
+
+  def entityForName(name: String): Entity = {
+    domainTypes.find { p =>
+      p.isInstanceOf[Entity] && p.getName == name
+    }.get.asInstanceOf[Entity]
+  }
 }
 
 trait Nameable {
