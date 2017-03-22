@@ -99,38 +99,6 @@ class InsertExamplesSqlGenerator extends Generator {
     getSubclassesDeep(d)(e).flatMap(f => f.getDeclaredFields)
   }
 
-  def embed(domain: Domain)(name: String, optional: Boolean, type_ : Type): String = {
-    def notNull(optional_ : Boolean): String = {
-      if (optional_) {
-        ""
-      } else {
-        " NOT NULL"
-      }
-    }
-
-    (name, optional, type_) match {
-      case ("id", _, LongType) => "id BIGSERIAL PRIMARY KEY"
-      case (name_, optional_, LongType) => s"${camelCaseToSnakeCase(name_)} BIGINT${notNull(optional_)}"
-      case (name_, optional_, IntegerType) => s"${camelCaseToSnakeCase(name_)} INT${notNull(optional_)}"
-      case (name_, optional_, StringType) => s"${camelCaseToSnakeCase(name_)} VARCHAR${notNull(optional_)}"
-      case (name_, optional_, BooleanType) => s"${camelCaseToSnakeCase(name_)} BOOLEAN${notNull(optional_)}"
-      case (name_, optional_, LocalTimeType) => s"${camelCaseToSnakeCase(name_)} TIME WITHOUT TIME ZONE${notNull(optional_)}"
-      case (name_, optional_, LocalDateTimeType) => s"${camelCaseToSnakeCase(name_)} TIMESTAMP WITHOUT TIME ZONE${notNull(optional_)}"
-      case (name_, optional_, e: Enumeration) => s"${camelCaseToSnakeCase(name_)} VARCHAR${notNull(optional_)}"
-      case (name_, optional_, e: Entity) => s"${camelCaseToSnakeCase(name_)} BIGINT${notNull(optional_)} REFERENCES ${getTableName(e)}(id)"
-      case (name_, optional_, v: ValueObject) => (
-        v.getFields.flatMap {
-          case of: OrdinaryField => Some(embed(domain)(name_ + "_" + of.getName, optional_ || of.isOptional, of.getType))
-          case _: ListField => None
-        } ++
-          getSubclassFields(domain)(v).flatMap {
-            case of: OrdinaryField => Some(embed(domain)(name + "_" + of.getName, optional = true, of.getType))
-            case _: ListField => None
-          }
-        ).mkString(",\n")
-    }
-  }
-
   def isOnManySideOfListRelation(d: Domain)(e: DataContainer): Boolean = {
     d.getDomainTypes.exists(p => p.getDeclaredFields.exists {
       case ListField(_, _, type_) => type_ == e
