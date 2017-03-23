@@ -2,7 +2,8 @@ INSERT INTO person (
   first_name,
   last_name,
   company,
-  contact_information,
+  contact_information_email,
+  contact_information_phone_number,
   confirmed,
   token,
   password,
@@ -15,10 +16,12 @@ INSERT INTO person (
   NULL,
   NULL,
   NULL,
+  NULL,
   NULL
 ), (
   'Tero',
   'Packalen',
+  NULL,
   NULL,
   NULL,
   NULL,

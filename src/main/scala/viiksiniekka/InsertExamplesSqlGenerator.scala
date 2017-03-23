@@ -120,23 +120,49 @@ class InsertExamplesSqlGenerator extends Generator {
     }
   }
 
-  def getColumns(d: Domain)(e: DataContainer): Seq[Column] = e.getFields.flatMap {
-    case of: OrdinaryField => Some(Column(camelCaseToSnakeCase(of.getName), sqlType(of), !of.isOptional, of.name == "id", foreignKeyConstraint = Option.empty)) // TODO missing constraint
-    case _: ListField => None
-  } ++
-    getSubclassFields(d)(e).flatMap {
-      case of: OrdinaryField => Some(Column(camelCaseToSnakeCase(of.getName), sqlType(of), notNull = false, isPrimaryKey = of.name == "id", foreignKeyConstraint = Option.empty)) // TODO missing constraint
-      case _: ListField => None
-    } ++ {
-    if (isOnManySideOfListRelation(d)(e)) {
-      getOneSideOfListRelation(d)(e) match {
-        case Some(column) => Seq(column)
-        case None => Seq()
+  def getColumns(d: Domain)(e: DataContainer): Seq[Column] =
+    e.getFields.flatMap {
+      case OrdinaryField(name, docs, optional, vo: ValueObject) => {
+        vo.getDeclaredFields.flatMap {
+          case of: OrdinaryField => Seq(Column(
+            camelCaseToSnakeCase(name) + "_" + camelCaseToSnakeCase(of.getName),
+            sqlType(of),
+            !(optional || of.isOptional),
+            of.getName == "id",
+            None)) // TODO missing constraint
+          case _: ListField => Seq()
+        }
       }
-    } else {
-      Seq()
+      case of@OrdinaryField(name, docs, optional, type_) => {
+        Seq(Column(camelCaseToSnakeCase(name), sqlType(of), !optional, name == "id", None)) // TODO missing constraint
+      }
+      case ListField(_, _, _) => Seq()
+    } ++ getSubclassFields(d)(e).flatMap {
+      case OrdinaryField(name, docs, optional, vo: ValueObject) => {
+        vo.getDeclaredFields.flatMap {
+          case of: OrdinaryField => Seq(Column(
+            camelCaseToSnakeCase(name) + "_" + camelCaseToSnakeCase(of.getName),
+            sqlType(of),
+            false,
+            of.getName == "id",
+            None)) // TODO missing constraint
+          case _: ListField => Seq()
+        }
+      }
+      case of@OrdinaryField(name, docs, _, type_) => {
+        Seq(Column(camelCaseToSnakeCase(name), sqlType(of), false, name == "id", None)) // TODO missing constraint
+      }
+      case ListField(_, _, _) => Seq()
+    } ++ {
+      if (isOnManySideOfListRelation(d)(e)) {
+        getOneSideOfListRelation(d)(e) match {
+          case Some(column) => Seq(column)
+          case None => Seq()
+        }
+      } else {
+        Seq()
+      }
     }
-  }
 
   def sqlType(of: OrdinaryField): SqlType = SqlType(of.type_ match {
     case BooleanType => "BOOLEAN"

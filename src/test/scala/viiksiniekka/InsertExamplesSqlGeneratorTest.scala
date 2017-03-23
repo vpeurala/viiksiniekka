@@ -31,12 +31,17 @@ class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
 
   test("Extracts the correct columns for person table") {
     val columns: Seq[Column] = generator.getColumns(shipYard)(shipYard.entityForName("Person"))
-    assert(columns.size === 9)
+    assert(columns.size === 10)
     assert(columns(0) === Column("id", SqlType("BIGINT"), notNull = true, isPrimaryKey = true, None))
     assert(columns(1) === Column("first_name", SqlType("VARCHAR"), notNull = true, isPrimaryKey = false, None))
     assert(columns(2) === Column("last_name", SqlType("VARCHAR"), notNull = true, isPrimaryKey = false, None))
     assert(columns(3) === Column("company", SqlType("BIGINT"), notNull = false, isPrimaryKey = false, None)) // TODO missing constraint
     assert(columns(4) === Column("contact_information_email", SqlType("VARCHAR"), notNull = false, isPrimaryKey = false, None))
+    assert(columns(5) === Column("contact_information_phone_number", SqlType("VARCHAR"), notNull = false, isPrimaryKey = false, None))
+    assert(columns(6) === Column("confirmed", SqlType("BOOLEAN"), notNull = false, isPrimaryKey = false, None))
+    assert(columns(7) === Column("token", SqlType("VARCHAR"), notNull = false, isPrimaryKey = false, None))
+    assert(columns(8) === Column("password", SqlType("VARCHAR"), notNull = false, isPrimaryKey = false, None))
+    assert(columns(9) === Column("key_code", SqlType("VARCHAR"), notNull = false, isPrimaryKey = false, None))
   }
 
   test("Can generate person table test data insertion sql correctly") {
