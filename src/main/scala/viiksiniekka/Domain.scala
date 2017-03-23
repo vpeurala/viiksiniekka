@@ -9,6 +9,13 @@ class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq
 
   def getRootPackage: Package = rootPackage
 
+  def getEntities: Seq[Entity] = {
+    domainTypes.filter {
+      case e: Entity => true
+      case _ => false
+    }.map(_.asInstanceOf[Entity])
+  }
+
   def entityForName(name: String): Entity = {
     domainTypes.find { p =>
       p.isInstanceOf[Entity] && p.getName == name

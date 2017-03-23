@@ -52,22 +52,18 @@ class InsertExamplesSqlGenerator extends Generator {
   }
 
   override def generate(d: Domain): Map[String, String] = {
-    val elems = d.getDomainTypes.flatMap {
-      case e: DataContainer => if (isTopLevelEntity(d)(e)) {
+    val elems = d.getEntities.flatMap { e: Entity =>
+      if (isTopLevelEntity(d)(e)) {
         Some(sourceFileName(e.getName), entitySource(d)(e))
-      } else None
-      case _ => None
+      } else {
+        None
+      }
     }
 
     Map(elems: _*)
   }
 
-  private def isTopLevelEntity(d: Domain)(ev: DataContainer) = {
-    ev match {
-      case e: Entity => e.getExtends.isEmpty
-      case _: ValueObject => false
-    }
-  }
+  private def isTopLevelEntity(d: Domain)(e: Entity): Boolean = e.getExtends.isEmpty
 
   private def getTableName(e: DataContainer): String = {
     e.getExtends match {
@@ -173,25 +169,38 @@ class InsertExamplesSqlGenerator extends Generator {
     case _: DomainType => "BIGINT"
   })
 
-  def entitySource(d: Domain)(e: DataContainer): String = {
-    val table: Table = Table(getTableName(e), getColumns(d)(e))
+  def entitySource(d: Domain)(e: Entity): String = {
+    val table: Table = getTable(d)(e)
     s"""INSERT INTO ${table.name} (
        |${indent(2)(table.columns.filter(!_.isPrimaryKey).map(_.name).mkString(",\n"))}
-       |) VALUES ${e.getExamples.map(exampleToInsertValuesGroup(table)).map(g => s"(\n  ${g}\n)").mkString(", ")};
+       |) VALUES ${(e +: getSubclassesDeep(d)(e)).flatMap(_.getExamples).map(exampleToInsertValuesGroup(d)(table)).map(g => s"(\n  ${g}\n)").mkString(", ")};
        |""".stripMargin
   }
 
-  def exampleToInsertValuesGroup(table: Table)(example: Example): String = {
+  def getTable(d: Domain)(e: Entity): Table = {
+    Table(getTableName(e), getColumns(d)(e))
+  }
+
+  def exampleToInsertValuesGroup(d: Domain)(table: Table)(example: Example): String = {
     table.columns.flatMap(column => {
       if (column.isPrimaryKey) {
         Seq()
-      } else Seq(
+      } else {
         example.fieldValues.find(fv => camelCaseToSnakeCase(fv.getField.getName) == column.name) match {
-          case None => "NULL"
-          case Some(SimpleFieldValue(field: Field, v: String)) if field.getType == StringType => s"'${v}'"
-          case Some(SimpleFieldValue(field: Field, v: String)) => v
-          case Some(ReferenceFieldValue(field: Field, ref: String)) => ref
-        })
+          case None => Seq("NULL")
+          case Some(SimpleFieldValue(field: Field, v: String)) if field.getType == StringType => Seq(s"'${v}'")
+          case Some(SimpleFieldValue(field: Field, v: String)) => Seq(v)
+          case Some(ReferenceFieldValue(field: Field, ref: String)) => {
+            val domainType = field.getType.asInstanceOf[DomainType]
+            val example: Example = domainType.getExamples.find(ex => ex.name == ref).get
+            domainType match {
+              case e: Entity => Seq(s"SELECT id FROM ${getTable(d)(e).name} WHERE TODO")
+              case v: ValueObject => example.fieldValues
+            }
+
+          }
+        }
+      }
     }).mkString(",\n  ")
   }
 }
