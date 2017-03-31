@@ -108,7 +108,13 @@ class InsertExamplesSqlGenerator extends Generator {
         case ListField(_, _, type_) => type_ == manySide
         case _ => false
       }) match {
-        case Some(p: DataContainer) => Some(Column(getTableName(p), SqlType("BIGINT"), true, false, foreignKeyConstraint = Option.empty))
+        case Some(p: DataContainer) => Some(Column(
+          getTableName(p),
+          SqlType("BIGINT"),
+          notNull = true,
+          isPrimaryKey = false,
+          foreignKeyConstraint = Option.empty,
+          Seq()))
         case None => None
       }
     } else {
@@ -118,35 +124,43 @@ class InsertExamplesSqlGenerator extends Generator {
 
   def getColumns(d: Domain)(e: DataContainer): Seq[Column] =
     e.getFields.flatMap {
-      case OrdinaryField(name, docs, optional, vo: ValueObject) => {
+      case of1@OrdinaryField(name, docs, optional, vo: ValueObject) => {
         vo.getDeclaredFields.flatMap {
-          case of: OrdinaryField => Seq(Column(
-            camelCaseToSnakeCase(name) + "_" + camelCaseToSnakeCase(of.getName),
-            sqlType(of),
-            !(optional || of.isOptional),
-            of.getName == "id",
-            None)) // TODO missing constraint
+          case of2: OrdinaryField => Seq(Column(
+            camelCaseToSnakeCase(name) + "_" + camelCaseToSnakeCase(of2.getName),
+            sqlType(of2),
+            !(optional || of2.isOptional),
+            of2.getName == "id",
+            None,
+            Seq(of1, of2))) // TODO missing constraint
           case _: ListField => Seq()
         }
       }
       case of@OrdinaryField(name, docs, optional, type_) => {
-        Seq(Column(camelCaseToSnakeCase(name), sqlType(of), !optional, name == "id", None)) // TODO missing constraint
+        Seq(Column(camelCaseToSnakeCase(name), sqlType(of), !optional, name == "id", None, Seq(of))) // TODO missing constraint
       }
       case ListField(_, _, _) => Seq()
     } ++ getSubclassFields(d)(e).flatMap {
-      case OrdinaryField(name, docs, optional, vo: ValueObject) => {
+      case of1@OrdinaryField(name, docs, optional, vo: ValueObject) => {
         vo.getDeclaredFields.flatMap {
-          case of: OrdinaryField => Seq(Column(
-            camelCaseToSnakeCase(name) + "_" + camelCaseToSnakeCase(of.getName),
-            sqlType(of),
+          case of2: OrdinaryField => Seq(Column(
+            camelCaseToSnakeCase(name) + "_" + camelCaseToSnakeCase(of2.getName),
+            sqlType(of2),
             false,
-            of.getName == "id",
-            None)) // TODO missing constraint
+            of2.getName == "id",
+            None,
+            Seq(of1, of2))) // TODO missing constraint
           case _: ListField => Seq()
         }
       }
       case of@OrdinaryField(name, docs, _, type_) => {
-        Seq(Column(camelCaseToSnakeCase(name), sqlType(of), false, name == "id", None)) // TODO missing constraint
+        Seq(Column(
+          camelCaseToSnakeCase(name),
+          sqlType(of),
+          false,
+          name == "id",
+          None,
+          Seq(of))) // TODO missing constraint
       }
       case ListField(_, _, _) => Seq()
     } ++ {
@@ -181,25 +195,29 @@ class InsertExamplesSqlGenerator extends Generator {
     Table(getTableName(e), getColumns(d)(e))
   }
 
+  def getFieldFromExample(domain: Domain)(example: Example)(fields: Seq[Field]): String = {
+    val valueOfHeadField: Value = example.getValueForFieldNamed(domain)(fields.head.getName)
+    if (fields.tail.isEmpty) {
+      valueOfHeadField match {
+        case SimpleValue(value) => s"'${value}'"
+        case e: Example => throw new IllegalArgumentException(s"Whole example is unsuitable for string value: ${e}")
+        case Null => "NULL"
+      }
+    } else {
+      valueOfHeadField match {
+        case SimpleValue(value) => throw new IllegalArgumentException(s"Simple value found too soon: ${value}, path remaining: ${fields.tail}")
+        case e: Example => getFieldFromExample(domain)(e)(fields.tail)
+        case Null => "NULL"
+      }
+    }
+  }
+
   def exampleToInsertValuesGroup(d: Domain)(table: Table)(example: Example): String = {
     table.columns.flatMap(column => {
       if (column.isPrimaryKey) {
-        Seq()
+        None
       } else {
-        example.fieldValues.find(fv => camelCaseToSnakeCase(fv.getField.getName) == column.name) match {
-          case None => Seq("NULL")
-          case Some(SimpleFieldValue(field: Field, v: String)) if field.getType == StringType => Seq(s"'${v}'")
-          case Some(SimpleFieldValue(field: Field, v: String)) => Seq(v)
-          case Some(ReferenceFieldValue(field: Field, ref: String)) => {
-            val domainType = field.getType.asInstanceOf[DomainType]
-            val example: Example = domainType.getExamples.find(ex => ex.name == ref).get
-            domainType match {
-              case e: Entity => Seq(s"SELECT id FROM ${getTable(d)(e).name} WHERE TODO")
-              case v: ValueObject => example.fieldValues
-            }
-
-          }
-        }
+        Some(getFieldFromExample(d)(example)(column.fields))
       }
     }).mkString(",\n  ")
   }

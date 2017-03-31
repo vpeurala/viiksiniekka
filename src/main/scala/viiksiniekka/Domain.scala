@@ -1,6 +1,26 @@
 package viiksiniekka
 
 class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq[Aggregate], repositories: Seq[Repository]) {
+  def exampleForName(name: String): Example = {
+    val examplesForName = domainTypes.flatMap {
+      dt: DomainType =>
+        dt.getExamples.flatMap { e: Example =>
+          if (e.name == name) {
+            Some(e)
+          } else {
+            None
+          }
+        }
+    }
+    if (examplesForName.isEmpty) {
+      throw new IllegalArgumentException(s"No example found for name '${name}'.")
+    } else if (examplesForName.size == 1) {
+      examplesForName.head
+    } else {
+      throw new IllegalStateException(s"More than one example found for name '${name}': ${examplesForName}")
+    }
+  }
+
   def getDomainTypes: Seq[DomainType] = domainTypes
 
   def getAggregates: Seq[Aggregate] = aggregates
@@ -298,22 +318,46 @@ case class ListField(name: String, documentation: String, type_ : Type) extends 
   }
 }
 
-case class Example(name: String, fieldValues: Seq[FieldValue])
+sealed trait Value
+
+case class Example(name: String, fieldValues: Seq[FieldValue]) extends Value {
+  def getValueForFieldNamed(domain: Domain)(fieldName: String): Value = {
+    fieldValues.find(fv => fv.getField.getName == fieldName).getOrElse(new FieldValue {
+      override def getValue(domain: Domain) = Null
+
+      override def getField = throw new UnsupportedOperationException("getField")
+    }).getValue(domain)
+  }
+}
+
+case class SimpleValue(value: String) extends Value
+
+case class ListValue(value: Seq[Value]) extends Value
+
+case object Null extends Value
 
 sealed trait FieldValue {
   def getField: Field
+
+  def getValue(domain: Domain): Value
 }
 
 case class SimpleFieldValue(field: Field, value: String) extends FieldValue {
   override def getField: Field = field
+
+  override def getValue(domain: Domain): Value = SimpleValue(value)
 }
 
 case class ReferenceFieldValue(field: Field, ref: String) extends FieldValue {
   override def getField: Field = field
+
+  override def getValue(domain: Domain): Value = domain.exampleForName(ref)
 }
 
 case class ListFieldValue(field: Field, entries: Seq[ListEntry]) extends FieldValue {
   override def getField: Field = field
+
+  override def getValue(domain: Domain): Value = ListValue(entries.map(_.r.getValue(domain)))
 }
 
 case class ListEntry(r: ReferenceFieldValue)
