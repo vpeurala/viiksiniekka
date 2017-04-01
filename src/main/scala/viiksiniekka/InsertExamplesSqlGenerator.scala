@@ -200,7 +200,7 @@ class InsertExamplesSqlGenerator extends Generator {
     if (fields.tail.isEmpty) {
       valueOfHeadField match {
         case SimpleValue(value) => s"'${value}'"
-        case e: Example => throw new IllegalArgumentException(s"Whole example is unsuitable for string value: ${e}")
+        case e: Example => "SELECT id FROM TODO"
         case Null => "NULL"
       }
     } else {
@@ -217,6 +217,9 @@ class InsertExamplesSqlGenerator extends Generator {
       if (column.isPrimaryKey) {
         None
       } else {
+        if (column.fields.isEmpty) {
+          throw new IllegalStateException(s"Empty fields for column: ${column} in table ${table}")
+        }
         Some(getFieldFromExample(d)(example)(column.fields))
       }
     }).mkString(",\n  ")
