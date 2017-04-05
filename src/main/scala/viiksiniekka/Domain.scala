@@ -32,6 +32,12 @@ class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq
     }
   }
 
+  def domainTypeForExample(example: Example): DataContainer = {
+    getDataContainers.find { dc =>
+      dc.getExamples.contains(example)
+    }.get
+  }
+
   def getDomainTypes: Seq[DomainType] = domainTypes
 
   def getAggregates: Seq[Aggregate] = aggregates
@@ -45,6 +51,17 @@ class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq
       case e: Entity => true
       case _ => false
     }.map(_.asInstanceOf[Entity])
+  }
+
+  def getValueObjects: Seq[ValueObject] = {
+    domainTypes.filter {
+      case v: ValueObject => true
+      case _ => false
+    }.map(_.asInstanceOf[ValueObject])
+  }
+
+  def getDataContainers: Seq[DataContainer] = {
+    getEntities ++ getValueObjects
   }
 
   def entityForName(name: String): Entity = {

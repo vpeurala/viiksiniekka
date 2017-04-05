@@ -200,7 +200,7 @@ class InsertExamplesSqlGenerator extends Generator {
     if (fields.tail.isEmpty) {
       valueOfHeadField match {
         case SimpleValue(value) => s"'${value}'"
-        case e: Example => exampleToSelect(e)
+        case e: Example => exampleToSelect(domain)(e)
         case Null => "NULL"
       }
     } else {
@@ -212,8 +212,15 @@ class InsertExamplesSqlGenerator extends Generator {
     }
   }
 
-  def exampleToSelect(example: Example): String = {
-    "SELECT id FROM TODO"
+  def exampleToSelect(domain: Domain)(example: Example): String = {
+    val dt: DataContainer = domain.domainTypeForExample(example)
+    dt match {
+      case _: ValueObject => throw new UnsupportedOperationException(s"exampleToSelect not supported for value objects: ${example}")
+      case entity: Entity => {
+        val table = getTable(domain)(entity)
+        s"SELECT id FROM ${table.name}"
+      }
+    }
   }
 
   def exampleToInsertValuesGroup(d: Domain)(table: Table)(example: Example): String = {
@@ -223,7 +230,7 @@ class InsertExamplesSqlGenerator extends Generator {
       } else {
         if (column.fields.isEmpty) {
           // One side of one-to-many list example
-          Some(exampleToSelect(d.exampleContaining(example)))
+          Some(exampleToSelect(d)(d.exampleContaining(example)))
         } else {
           Some(getFieldFromExample(d)(example)(column.fields))
         }

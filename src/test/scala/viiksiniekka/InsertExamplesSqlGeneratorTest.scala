@@ -66,6 +66,45 @@ class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
     writeFile("src/test/resources/ddl/person_insert.sql", actualSource)
   }
 
+  test("Gets columns correctly for Notification") {
+    val columns: Seq[Column] = generator.getColumns(shipYard)(shipYard.entityForName("Notification"))
+    assert(columns.map(_.name) == Seq(
+      "id",
+      "status",
+      "yard_contact",
+      "site_foreman",
+      "additional_information",
+      "work_week_week_number",
+      "work_week_monday_start_time_hour",
+      "work_week_monday_start_time_minute",
+      "work_week_monday_end_time_hour",
+      "work_week_monday_end_time_minute",
+      "work_week_tuesday_start_time_hour",
+      "work_week_tuesday_start_time_minute",
+      "work_week_tuesday_end_time_hour",
+      "work_week_tuesday_end_time_minute",
+      "work_week_wednesday_start_time_hour",
+      "work_week_wednesday_start_time_minute",
+      "work_week_wednesday_end_time_hour",
+      "work_week_wednesday_end_time_minute",
+      "work_week_thursday_start_time_hour",
+      "work_week_thursday_start_time_minute",
+      "work_week_thursday_end_time_hour",
+      "work_week_thursday_end_time_minute",
+      "work_week_friday_start_time_hour",
+      "work_week_friday_start_time_minute",
+      "work_week_friday_end_time_hour",
+      "work_week_friday_end_time_minute",
+      "work_week_saturday_start_time_hour",
+      "work_week_saturday_start_time_minute",
+      "work_week_saturday_end_time_hour",
+      "work_week_saturday_end_time_minute",
+      "work_week_sunday_start_time_hour",
+      "work_week_sunday_start_time_minute",
+      "work_week_sunday_end_time_hour",
+      "work_week_sunday_end_time_minute"))
+  }
+
   private def createShipYard: Domain = {
     val xml: Elem = XML.load(getClass.getResourceAsStream("/ShipYard.xml"))
     val domainEl: DomainEl = DomainXmlParser.fromXml(xml)
