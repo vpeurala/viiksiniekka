@@ -51,7 +51,7 @@ INSERT INTO person (
 ), (
   'Ville',
   'Peurala',
-  SELECT id FROM TODO,
+  SELECT id FROM company,
   'ville.peurala@mail.com',
   '050 - 352 7878',
   'true',
@@ -61,7 +61,7 @@ INSERT INTO person (
 ), (
   'Tero',
   'Packalen',
-  SELECT id FROM TODO,
+  SELECT id FROM company,
   'tero.packalen@yard.com',
   '040 - 568 3313',
   'true',

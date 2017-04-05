@@ -122,48 +122,36 @@ class InsertExamplesSqlGenerator extends Generator {
     }
   }
 
-  def getColumns(d: Domain)(e: DataContainer): Seq[Column] =
-    e.getFields.flatMap {
-      case of1@OrdinaryField(name, docs, optional, vo: ValueObject) => {
-        vo.getDeclaredFields.flatMap {
-          case of2: OrdinaryField => Seq(Column(
-            camelCaseToSnakeCase(name) + "_" + camelCaseToSnakeCase(of2.getName),
-            sqlType(of2),
-            !(optional || of2.isOptional),
-            of2.getName == "id",
-            None,
-            Seq(of1, of2))) // TODO missing constraint
-          case _: ListField => Seq()
-        }
-      }
-      case of@OrdinaryField(name, docs, optional, type_) => {
-        Seq(Column(camelCaseToSnakeCase(name), sqlType(of), !optional, name == "id", None, Seq(of))) // TODO missing constraint
-      }
-      case ListField(_, _, _) => Seq()
-    } ++ getSubclassFields(d)(e).flatMap {
-      case of1@OrdinaryField(name, docs, optional, vo: ValueObject) => {
-        vo.getDeclaredFields.flatMap {
-          case of2: OrdinaryField => Seq(Column(
-            camelCaseToSnakeCase(name) + "_" + camelCaseToSnakeCase(of2.getName),
-            sqlType(of2),
-            false,
-            of2.getName == "id",
-            None,
-            Seq(of1, of2))) // TODO missing constraint
-          case _: ListField => Seq()
-        }
-      }
-      case of@OrdinaryField(name, docs, _, type_) => {
+  def getColumnsForField(d: Domain)(namePrefix: String, optionalPrefix: Boolean, fieldsPrefix: Seq[Field])(f: Field): Seq[Column] = {
+    f match {
+      case of@OrdinaryField(name, docs, optional, vo: ValueObject) =>
+        getColumnsInner(d)(
+          namePrefix = if (namePrefix.isEmpty) {
+            camelCaseToSnakeCase(name)
+          } else {
+            namePrefix + "_" + camelCaseToSnakeCase(name)
+          },
+          optionalPrefix = optionalPrefix || optional,
+          fieldsPrefix = fieldsPrefix :+ of)(vo)
+      case of@OrdinaryField(name, docs, optional, type_) =>
         Seq(Column(
-          camelCaseToSnakeCase(name),
+          if (namePrefix.isEmpty) {
+            camelCaseToSnakeCase(name)
+          } else {
+            namePrefix + "_" + camelCaseToSnakeCase(name)
+          },
           sqlType(of),
-          false,
+          !(optionalPrefix || optional),
           name == "id",
-          None,
-          Seq(of))) // TODO missing constraint
-      }
+          None, // TODO missing constraint
+          fieldsPrefix :+ of))
       case ListField(_, _, _) => Seq()
-    } ++ {
+    }
+  }
+
+  def getColumnsInner(d: Domain)(namePrefix: String, optionalPrefix: Boolean, fieldsPrefix: Seq[Field])(e: DataContainer): Seq[Column] = {
+    e.getFields.flatMap(getColumnsForField(d)(namePrefix, optionalPrefix, fieldsPrefix)) ++
+      getSubclassFields(d)(e).flatMap(getColumnsForField(d)(namePrefix, optionalPrefix, fieldsPrefix)) ++ {
       if (isOnManySideOfListRelation(d)(e)) {
         getOneSideOfListRelation(d)(e) match {
           case Some(column) => Seq(column)
@@ -173,6 +161,11 @@ class InsertExamplesSqlGenerator extends Generator {
         Seq()
       }
     }
+  }
+
+  def getColumns(d: Domain)(e: DataContainer): Seq[Column] = {
+    getColumnsInner(d)(namePrefix = "", optionalPrefix = false, fieldsPrefix = Seq())(e)
+  }
 
   def sqlType(of: OrdinaryField): SqlType = SqlType(of.type_ match {
     case BooleanType => "BOOLEAN"
