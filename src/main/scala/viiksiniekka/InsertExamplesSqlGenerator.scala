@@ -205,13 +205,28 @@ class InsertExamplesSqlGenerator extends Generator {
     }
   }
 
+  def toWhereClauseCondition(domain: Domain)(fv: FieldValue): Option[String] = {
+    fv match {
+      case _: ListFieldValue => None
+      case _: ReferenceFieldValue => None
+      case SimpleFieldValue(field, value) => {
+        if (field.getType == StringType) {
+          Some(s"${camelCaseToSnakeCase(field.getName)} = '${value}'")
+        } else {
+          Some(s"${camelCaseToSnakeCase(field.getName)} = ${value}")
+        }
+      }
+    }
+  }
+
   def exampleToSelect(domain: Domain)(example: Example): String = {
     val dt: DataContainer = domain.domainTypeForExample(example)
     dt match {
       case _: ValueObject => throw new UnsupportedOperationException(s"exampleToSelect not supported for value objects: ${example}")
       case entity: Entity => {
         val table = getTable(domain)(entity)
-        s"SELECT id FROM ${table.name}"
+        val whereClause = example.fieldValues.flatMap(toWhereClauseCondition(domain)).mkString(" AND ")
+        s"SELECT id FROM ${table.name} WHERE ${whereClause}"
       }
     }
   }

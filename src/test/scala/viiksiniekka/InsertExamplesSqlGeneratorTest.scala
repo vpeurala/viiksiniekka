@@ -61,9 +61,9 @@ class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
 
   test("Can generate person table test data insertion sql correctly") {
     val sqlInserts = generator.generate(shipYard)
-    //val expectedSource: String = readFile("src/test/resources/ddl/person_insert.sql")
+    val expectedSource: String = readFile("src/test/resources/ddl/person_insert.sql")
     val actualSource: String = sqlInserts("src/main/resources/ddl/person_insert.sql")
-    writeFile("src/test/resources/ddl/person_insert.sql", actualSource)
+    assert(expectedSource === actualSource)
   }
 
   test("Gets columns correctly for Notification") {

@@ -51,7 +51,7 @@ INSERT INTO person (
 ), (
   'Ville',
   'Peurala',
-  SELECT id FROM company,
+  SELECT id FROM company WHERE name = 'STX Group',
   'ville.peurala@mail.com',
   '050 - 352 7878',
   'true',
@@ -61,7 +61,7 @@ INSERT INTO person (
 ), (
   'Tero',
   'Packalen',
-  SELECT id FROM company,
+  SELECT id FROM company WHERE name = 'Maersk',
   'tero.packalen@yard.com',
   '040 - 568 3313',
   'true',
