@@ -1,17 +1,28 @@
 package viiksiniekka
 
 class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq[Aggregate], repositories: Seq[Repository]) {
-  def exampleForName(name: String): Example = {
-    val examplesForName = domainTypes.flatMap {
-      dt: DomainType =>
-        dt.getExamples.flatMap { e: Example =>
-          if (e.name == name) {
-            Some(e)
-          } else {
-            None
+  def exampleContaining(example: Example): Example = {
+    val examplesContaining: Seq[Example] = getExamples.filter { ex =>
+      ex.fieldValues.exists {
+        case ListFieldValue(field, entries) => {
+          entries.exists { le =>
+            le.example == example
           }
         }
+        case _ => false
+      }
     }
+    if (examplesContaining.isEmpty) {
+      throw new IllegalArgumentException(s"No example found containing example '${example}'.")
+    } else if (examplesContaining.size == 1) {
+      examplesContaining.head
+    } else {
+      throw new IllegalStateException(s"More than one example found containing '${example}': ${examplesContaining}")
+    }
+  }
+
+  def exampleForName(name: String): Example = {
+    val examplesForName = getExamples.filter(_.name == name)
     if (examplesForName.isEmpty) {
       throw new IllegalArgumentException(s"No example found for name '${name}'.")
     } else if (examplesForName.size == 1) {
@@ -40,6 +51,12 @@ class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq
     domainTypes.find { p =>
       p.isInstanceOf[Entity] && p.getName == name
     }.get.asInstanceOf[Entity]
+  }
+
+  def getExamples: Seq[Example] = {
+    domainTypes.flatMap { dt =>
+      dt.getExamples
+    }
   }
 }
 
@@ -348,19 +365,19 @@ case class SimpleFieldValue(field: Field, value: String) extends FieldValue {
   override def getValue(domain: Domain): Value = SimpleValue(value)
 }
 
-case class ReferenceFieldValue(field: Field, ref: String) extends FieldValue {
+case class ReferenceFieldValue(field: Field, example: Example) extends FieldValue {
   override def getField: Field = field
 
-  override def getValue(domain: Domain): Value = domain.exampleForName(ref)
+  override def getValue(domain: Domain): Value = example
 }
 
 case class ListFieldValue(field: Field, entries: Seq[ListEntry]) extends FieldValue {
   override def getField: Field = field
 
-  override def getValue(domain: Domain): Value = ListValue(entries.map(_.r.getValue(domain)))
+  override def getValue(domain: Domain): Value = throw new UnsupportedOperationException("getValue")
 }
 
-case class ListEntry(r: ReferenceFieldValue)
+case class ListEntry(example: Example)
 
 case class Aggregate(name: String, documentation: String, package_ : Package, rootEntity: Entity, rootHasId: Boolean, components: Seq[AggregateComponent]) {
   def aliasOfDataContainerInThisAggregate(d: DataContainer): Option[String] = {

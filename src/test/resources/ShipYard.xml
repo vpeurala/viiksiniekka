@@ -42,6 +42,12 @@
                             <entry ref="Genadij as a fitter in building 43"/>
                         </list>
                     </fieldvalue>
+                    <fieldvalue field="log">
+                        <list>
+                            <entry ref="Creation of notification 1"/>
+                            <entry ref="Sending of notification 1"/>
+                        </list>
+                    </fieldvalue>
                 </example>
             </examples>
         </entity>

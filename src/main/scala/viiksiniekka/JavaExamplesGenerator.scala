@@ -63,13 +63,8 @@ class JavaExamplesGenerator extends JavaGenerator {
         }
         case d: DataContainer => fieldValue match {
           case _: SimpleFieldValue => throw new IllegalArgumentException(s"Cannot have a simple value on a domain type field: '${fieldValue}'.")
-          case ReferenceFieldValue(field, ref) => {
-            val exampleOpt = d.getExamples.find(_.name == ref)
-            exampleOpt match {
-              case None => throw new IllegalArgumentException(s"Reference not found: '${ref}' with field type: '${field.getType.getName}' for fieldValue: '${fieldValue}'.")
-              case Some(example: Example) => s"${d.getName}Examples.${ordinaryTextToCamelCase(example.name)}()"
-            }
-          }
+          case ReferenceFieldValue(field, example) =>
+            s"${d.getName}Examples.${ordinaryTextToCamelCase(example.name)}()"
           case ListFieldValue(_, _) => throw new Error("We should never arrive here. This is a bug.")
         }
         case e: Enumeration => fieldValue match {

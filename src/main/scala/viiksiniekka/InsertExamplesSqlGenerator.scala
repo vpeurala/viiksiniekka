@@ -200,7 +200,7 @@ class InsertExamplesSqlGenerator extends Generator {
     if (fields.tail.isEmpty) {
       valueOfHeadField match {
         case SimpleValue(value) => s"'${value}'"
-        case e: Example => "SELECT id FROM TODO"
+        case e: Example => exampleToSelect(e)
         case Null => "NULL"
       }
     } else {
@@ -212,15 +212,21 @@ class InsertExamplesSqlGenerator extends Generator {
     }
   }
 
+  def exampleToSelect(example: Example): String = {
+    "SELECT id FROM TODO"
+  }
+
   def exampleToInsertValuesGroup(d: Domain)(table: Table)(example: Example): String = {
     table.columns.flatMap(column => {
       if (column.isPrimaryKey) {
         None
       } else {
         if (column.fields.isEmpty) {
-          throw new IllegalStateException(s"Empty fields for column: ${column} in table ${table}")
+          // One side of one-to-many list example
+          Some(exampleToSelect(d.exampleContaining(example)))
+        } else {
+          Some(getFieldFromExample(d)(example)(column.fields))
         }
-        Some(getFieldFromExample(d)(example)(column.fields))
       }
     }).mkString(",\n  ")
   }

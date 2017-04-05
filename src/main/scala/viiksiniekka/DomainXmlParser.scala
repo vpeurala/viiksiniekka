@@ -74,8 +74,21 @@ object DomainXmlParser {
   private def toFieldValue(n: Node): FieldValueEl = {
     val field = (n \ "@field").text
     val ref = (n \ "@ref").text
+    val list = toFieldValueList(n \ "list")
     val value = n.text
-    FieldValueEl(field, ref, value)
+    FieldValueEl(field, ref, value, list)
+  }
+
+  private def toFieldValueList(n: NodeSeq): Seq[ListEntryEl] = {
+    if (n.isEmpty) {
+      Seq()
+    } else {
+      (n \ "entry").map(toListEntry)
+    }
+  }
+
+  private def toListEntry(n: Node): ListEntryEl = {
+    ListEntryEl((n \ "@ref").text)
   }
 
   private def toAggregateComponent(n: Node): AggregateComponentEl = {

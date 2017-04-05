@@ -15,6 +15,9 @@ public class NotificationExamples {
                 .withWorkWeek(WorkweekExamples.week48())
                 .withWorkEntries(asList(
                         WorkEntryExamples.jurijAsAWelderInBuilding44Ship2(),
-                        WorkEntryExamples.genadijAsAFitterInBuilding43()));
+                        WorkEntryExamples.genadijAsAFitterInBuilding43()))
+                .withLog(asList(
+                        LogEntryExamples.creationOfNotification1(),
+                        LogEntryExamples.sendingOfNotification1()));
     }
 }

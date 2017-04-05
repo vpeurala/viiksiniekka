@@ -7,23 +7,21 @@ import scala.xml.{Elem, XML}
 class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll with ReadWriteFile {
   var shipYard: Domain = _
   var generator: InsertExamplesSqlGenerator = _
-  var sqlInserts: Map[String, String] = _
-  var sqlInsertsSum: String = _
 
   override def beforeAll(): Unit = {
     shipYard = createShipYard
     generator = new InsertExamplesSqlGenerator()
-    sqlInserts = generator.generate(shipYard)
-    sqlInsertsSum = generator.generateSum(shipYard)
   }
 
   test("Can generate company table test data insertion sql correctly") {
+    val sqlInserts = generator.generate(shipYard)
     val expectedSource: String = readFile("src/test/resources/ddl/company_insert.sql")
     val actualSource: String = sqlInserts("src/main/resources/ddl/company_insert.sql")
     assert(expectedSource === actualSource)
   }
 
   test("Can generate building table test data insertion sql correctly") {
+    val sqlInserts = generator.generate(shipYard)
     val expectedSource: String = readFile("src/test/resources/ddl/building_insert.sql")
     val actualSource: String = sqlInserts("src/main/resources/ddl/building_insert.sql")
     assert(expectedSource === actualSource)
@@ -55,7 +53,14 @@ class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
     assert(keyCodeColumn.name === "key_code")
   }
 
+  test("Can get example containing another example") {
+    val creationOfNotification1 = shipYard.exampleForName("Creation of notification 1")
+    val exampleContainingCreationOfNotification1 = shipYard.exampleContaining(creationOfNotification1)
+    assert(exampleContainingCreationOfNotification1 === shipYard.exampleForName("Notification 1"))
+  }
+
   test("Can generate person table test data insertion sql correctly") {
+    val sqlInserts = generator.generate(shipYard)
     //val expectedSource: String = readFile("src/test/resources/ddl/person_insert.sql")
     val actualSource: String = sqlInserts("src/main/resources/ddl/person_insert.sql")
     writeFile("src/test/resources/ddl/person_insert.sql", actualSource)

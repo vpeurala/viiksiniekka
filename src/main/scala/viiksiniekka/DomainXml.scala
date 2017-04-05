@@ -30,7 +30,9 @@ case class MemberEl(name: String)
 
 case class ExampleEl(name: String, fieldValues: Seq[FieldValueEl])
 
-case class FieldValueEl(field: String, ref: String, value: String)
+case class FieldValueEl(field: String, ref: String, value: String, list: Seq[ListEntryEl])
+
+case class ListEntryEl(ref: String)
 
 case class AggregateEl(name: String, rootEntity: String, rootHasId: Boolean, components: Seq[AggregateComponentEl])
 

@@ -103,6 +103,21 @@ object DomainXmlTransformer {
       }
     }
 
+    def exampleForName(exampleName: String): Example = {
+      typeTable.values.find { dt =>
+        dt.getExamples.exists { ex =>
+          ex.name == exampleName
+        }
+      }.get.getExamples.find { ex =>
+        ex.name == exampleName
+      }.get
+    }
+
+    def listEntryElToListEntry(listEntryEl: ListEntryEl): ListEntry = {
+      val exampleName: String = listEntryEl.ref
+      ListEntry(exampleForName(exampleName))
+    }
+
     def makeExamples(declaredFields: Seq[Field], superTypeOpt: Option[DataContainer])(exampleEls: Seq[ExampleEl]): Seq[Example] = {
       exampleEls.map(
         exampleEl => Example(
@@ -110,8 +125,10 @@ object DomainXmlTransformer {
           exampleEl.fieldValues.map(fieldValueEl => {
             val field: Field = (declaredFields ++ superTypeOpt.map(_.getFields).getOrElse(Seq())).find(f => f.getName == fieldValueEl.field).getOrElse(
               throw new IllegalArgumentException(s"Field '${fieldValueEl.field}' not found for example element: '${exampleEl}'."))
-            if (!fieldValueEl.ref.isEmpty) {
-              ReferenceFieldValue(field, fieldValueEl.ref)
+            if (fieldValueEl.list.nonEmpty) {
+              ListFieldValue(field, fieldValueEl.list.map(listEntryElToListEntry))
+            } else if (!fieldValueEl.ref.isEmpty) {
+              ReferenceFieldValue(field, exampleForName(fieldValueEl.ref))
             } else {
               SimpleFieldValue(field, fieldValueEl.value)
             }
