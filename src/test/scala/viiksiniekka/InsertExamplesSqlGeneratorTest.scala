@@ -7,21 +7,21 @@ import scala.xml.{Elem, XML}
 class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll with ReadWriteFile {
   var shipYard: Domain = _
   var generator: InsertExamplesSqlGenerator = _
+  var sqlInserts: Map[String, String] = _
 
   override def beforeAll(): Unit = {
     shipYard = createShipYard
     generator = new InsertExamplesSqlGenerator()
+    sqlInserts = generator.generate(shipYard)
   }
 
   test("Can generate company table test data insertion sql correctly") {
-    val sqlInserts = generator.generate(shipYard)
     val expectedSource: String = readFile("src/test/resources/ddl/company_insert.sql")
     val actualSource: String = sqlInserts("src/main/resources/ddl/company_insert.sql")
     assert(expectedSource === actualSource)
   }
 
   test("Can generate building table test data insertion sql correctly") {
-    val sqlInserts = generator.generate(shipYard)
     val expectedSource: String = readFile("src/test/resources/ddl/building_insert.sql")
     val actualSource: String = sqlInserts("src/main/resources/ddl/building_insert.sql")
     assert(expectedSource === actualSource)
@@ -60,7 +60,6 @@ class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
   }
 
   test("Can generate person table test data insertion sql correctly") {
-    val sqlInserts = generator.generate(shipYard)
     val expectedSource: String = readFile("src/test/resources/ddl/person_insert.sql")
     val actualSource: String = sqlInserts("src/main/resources/ddl/person_insert.sql")
     assert(expectedSource === actualSource)
@@ -106,9 +105,38 @@ class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
   }
 
   test("Can generate notification table test data insertion sql correctly") {
-    val sqlInserts = generator.generate(shipYard)
     val expectedSource: String = readFile("src/test/resources/ddl/notification_insert.sql")
     val actualSource: String = sqlInserts("src/main/resources/ddl/notification_insert.sql")
+    assert(expectedSource === actualSource)
+  }
+
+  test("Can generate log_entry table test data insertion sql correctly") {
+    val expectedSource: String = readFile("src/test/resources/ddl/log_entry_insert.sql")
+    val actualSource: String = sqlInserts("src/main/resources/ddl/log_entry_insert.sql")
+    assert(expectedSource === actualSource)
+  }
+
+  test("Can generate work_entry table test data insertion sql correctly") {
+    val expectedSource: String = readFile("src/test/resources/ddl/work_entry_insert.sql")
+    val actualSource: String = sqlInserts("src/main/resources/ddl/work_entry_insert.sql")
+    assert(expectedSource === actualSource)
+  }
+
+  test("Can generate ship table test data insertion sql correctly") {
+    val expectedSource: String = readFile("src/test/resources/ddl/ship_insert.sql")
+    val actualSource: String = sqlInserts("src/main/resources/ddl/ship_insert.sql")
+    assert(expectedSource === actualSource)
+  }
+
+  test("Can generate ship_area table test data insertion sql correctly") {
+    val expectedSource: String = readFile("src/test/resources/ddl/ship_area_insert.sql")
+    val actualSource: String = sqlInserts("src/main/resources/ddl/ship_area_insert.sql")
+    assert(expectedSource === actualSource)
+  }
+
+  test("Can generate sum of all test data inserts") {
+    val expectedSource: String = readFile("src/test/resources/ddl/V2__Insert_Test_Data_ShipYard.sql")
+    val actualSource = generator.generateSum(shipYard)
     assert(expectedSource === actualSource)
   }
 

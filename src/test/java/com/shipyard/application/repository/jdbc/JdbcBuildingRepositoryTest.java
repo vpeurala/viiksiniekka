@@ -24,7 +24,7 @@ public class JdbcBuildingRepositoryTest {
         dataSource.setUrl("jdbc:h2:mem:shipyard");
         String ddl1 = stringResource("/ddl/V1__Create_Tables_ShipYard.sql");
         executeDdl(dataSource, ddl1);
-        String ddl2 = stringResource("/ddl/building_insert.sql");
+        String ddl2 = stringResource("/ddl/V2__Insert_Test_Data_ShipYard.sql");
         executeDdl(dataSource, ddl2);
         repository = new JdbcBuildingRepository(dataSource);
     }

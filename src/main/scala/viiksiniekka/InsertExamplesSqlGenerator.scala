@@ -196,11 +196,29 @@ class InsertExamplesSqlGenerator extends Generator {
     Table(getTableName(e), getColumns(d)(e))
   }
 
+  def toTimestamp(value: String): String = {
+    if (!value.matches("\\d{2}.\\d{2}.\\d{4} \\d{2}:\\d{2}")) {
+      throw new IllegalArgumentException(s"Illegal value '${value}' for LocalTime field: the required pattern is HH:mm.")
+    }
+    val parts = value.split("[\\.: ]")
+    val day = "%02d".format(parts(0).toInt)
+    val month = "%02d".format(parts(1).toInt)
+    val year = "%04d".format(parts(2).toInt)
+    val hour = "%02d".format(parts(3).toInt)
+    val minute = "%02d".format(parts(4).toInt)
+    s"'${year}-${month}-${day} ${hour}:${minute}:00'"
+  }
+
   def getFieldFromExample(domain: Domain)(example: Example)(fields: Seq[Field]): String = {
     val valueOfHeadField: Value = example.getValueForFieldNamed(domain)(fields.head.getName)
     if (fields.tail.isEmpty) {
       valueOfHeadField match {
-        case SimpleValue(value) => s"'${value}'"
+        case SimpleValue(value) => fields.head.getType match {
+          case StringType => s"'${value}'"
+          case LocalDateTimeType => toTimestamp(value)
+          case e: Enumeration => s"'${value}'"
+          case _ => value
+        }
         case e: Example => exampleToSelect(domain)(e)
         case Null => "NULL"
       }
@@ -209,20 +227,6 @@ class InsertExamplesSqlGenerator extends Generator {
         case SimpleValue(value) => throw new IllegalArgumentException(s"Simple value found too soon: ${value}, path remaining: ${fields.tail}")
         case e: Example => getFieldFromExample(domain)(e)(fields.tail)
         case Null => "NULL"
-      }
-    }
-  }
-
-  def toWhereClauseCondition(domain: Domain)(fv: FieldValue): Option[String] = {
-    fv match {
-      case _: ListFieldValue => None
-      case _: ReferenceFieldValue => None
-      case SimpleFieldValue(field, value) => {
-        if (field.getType == StringType) {
-          Some(s"${camelCaseToSnakeCase(field.getName)} = '${value}'")
-        } else {
-          Some(s"${camelCaseToSnakeCase(field.getName)} = ${value}")
-        }
       }
     }
   }

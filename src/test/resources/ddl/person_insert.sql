@@ -60,7 +60,7 @@ INSERT INTO person (
   SELECT id FROM company WHERE id = 3 /* STX Group */,
   'ville.peurala@mail.com',
   '050 - 352 7878',
-  'true',
+  true,
   '76696c6c652e70657572616c614077756e646572646f672e6670',
   NULL,
   NULL
@@ -71,7 +71,7 @@ INSERT INTO person (
   SELECT id FROM company WHERE id = 2 /* Maersk */,
   'tero.packalen@yard.com',
   '040 - 568 3313',
-  'true',
+  true,
   '76696c6c652e70657572616c614077756e646572646f672e6671',
   NULL,
   NULL

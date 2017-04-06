@@ -1,0 +1,40 @@
+INSERT INTO work_entry (
+  id,
+  worker,
+  location_building,
+  location_ship,
+  location_ship_area,
+  occupation,
+  energy_requirements_oxyacetylene,
+  energy_requirements_composite_gas,
+  energy_requirements_argon,
+  energy_requirements_compressed_air,
+  energy_requirements_hot_works,
+  notification
+) VALUES (
+  1 /* Jurij as a welder in building 44 / ship 2 */,
+  SELECT id FROM person WHERE id = 7 /* Jurij Andrejev */,
+  SELECT id FROM building WHERE id = 2 /* Building 44 */,
+  SELECT id FROM ship WHERE id = 1 /* Ship 2 */,
+  NULL,
+  'Welder',
+  true,
+  false,
+  true,
+  false,
+  true,
+  SELECT id FROM notification WHERE id = 1 /* Notification 1 */
+), (
+  2 /* Genadij as a fitter in building 43 */,
+  SELECT id FROM person WHERE id = 8 /* Genadij Bogira */,
+  SELECT id FROM building WHERE id = 1 /* Building 43 */,
+  NULL,
+  NULL,
+  'Fitter',
+  false,
+  false,
+  false,
+  true,
+  false,
+  SELECT id FROM notification WHERE id = 1 /* Notification 1 */
+);
