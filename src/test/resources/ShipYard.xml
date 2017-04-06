@@ -139,11 +139,13 @@
                 <example name="Ville Peurala with contact information">
                     <fieldvalue field="firstName">Ville</fieldvalue>
                     <fieldvalue field="lastName">Peurala</fieldvalue>
+                    <fieldvalue field="company" ref="STX Group"/>
                     <fieldvalue field="contactInformation" ref="Contact information for Ville Peurala"/>
                 </example>
                 <example name="Tero Packalen with contact information">
                     <fieldvalue field="firstName">Tero</fieldvalue>
                     <fieldvalue field="lastName">Packalen</fieldvalue>
+                    <fieldvalue field="company" ref="Maersk"/>
                     <fieldvalue field="contactInformation" ref="Contact information for Tero Packalen"/>
                 </example>
             </examples>

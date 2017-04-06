@@ -7,6 +7,7 @@ public class ContactPersonExamples {
         return new ContactPersonBuilder()
                 .withFirstName("Ville")
                 .withLastName("Peurala")
+                .withCompany(CompanyExamples.sTXGroup())
                 .withContactInformation(ContactInformationExamples.contactInformationForVillePeurala());
     }
 
@@ -14,6 +15,7 @@ public class ContactPersonExamples {
         return new ContactPersonBuilder()
                 .withFirstName("Tero")
                 .withLastName("Packalen")
+                .withCompany(CompanyExamples.maersk())
                 .withContactInformation(ContactInformationExamples.contactInformationForTeroPackalen());
     }
 }

@@ -105,6 +105,13 @@ class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
       "work_week_sunday_end_time_minute"))
   }
 
+  test("Can generate notification table test data insertion sql correctly") {
+    val sqlInserts = generator.generate(shipYard)
+    val expectedSource: String = readFile("src/test/resources/ddl/notification_insert.sql")
+    val actualSource: String = sqlInserts("src/main/resources/ddl/notification_insert.sql")
+    assert(expectedSource === actualSource)
+  }
+
   private def createShipYard: Domain = {
     val xml: Elem = XML.load(getClass.getResourceAsStream("/ShipYard.xml"))
     val domainEl: DomainEl = DomainXmlParser.fromXml(xml)

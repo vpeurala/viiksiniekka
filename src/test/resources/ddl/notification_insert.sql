@@ -1,4 +1,5 @@
 INSERT INTO notification (
+  id,
   status,
   yard_contact,
   site_foreman,
@@ -33,9 +34,10 @@ INSERT INTO notification (
   work_week_sunday_end_time_hour,
   work_week_sunday_end_time_minute
 ) VALUES (
+  1 /* Notification 1 */,
   'Approved',
-  SELECT id FROM person WHERE first_name = 'Tero' AND last_name = 'Packalen',
-  SELECT id FROM person WHERE first_name = 'Ville' AND last_name = 'Peurala',
+  SELECT id FROM person WHERE id = 4 /* Tero Packalen with contact information */,
+  SELECT id FROM person WHERE id = 3 /* Ville Peurala with contact information */,
   'Sunday work is needed because we are behind schedule.',
   '48',
   '10',

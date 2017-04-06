@@ -65,6 +65,14 @@ class InsertExamplesSqlGenerator extends Generator {
 
   private def isTopLevelEntity(d: Domain)(e: Entity): Boolean = e.getExtends.isEmpty
 
+  def getTopLevelEntity(d: Domain)(e: Entity): Entity = {
+    if (isTopLevelEntity(d)(e)) {
+      e
+    } else {
+      getTopLevelEntity(d)(e.extends_.get.asInstanceOf[Entity])
+    }
+  }
+
   private def getTableName(e: DataContainer): String = {
     e.getExtends match {
       case None => camelCaseToSnakeCase(e.getName)
@@ -179,7 +187,7 @@ class InsertExamplesSqlGenerator extends Generator {
   def entitySource(d: Domain)(e: Entity): String = {
     val table: Table = getTable(d)(e)
     s"""INSERT INTO ${table.name} (
-       |${indent(2)(table.columns.filter(!_.isPrimaryKey).map(_.name).mkString(",\n"))}
+       |${indent(2)(table.columns.map(_.name).mkString(",\n"))}
        |) VALUES ${(e +: getSubclassesDeep(d)(e)).flatMap(_.getExamples).map(exampleToInsertValuesGroup(d)(table)).map(g => s"(\n  ${g}\n)").mkString(", ")};
        |""".stripMargin
   }
@@ -225,16 +233,22 @@ class InsertExamplesSqlGenerator extends Generator {
       case _: ValueObject => throw new UnsupportedOperationException(s"exampleToSelect not supported for value objects: ${example}")
       case entity: Entity => {
         val table = getTable(domain)(entity)
-        val whereClause = example.fieldValues.flatMap(toWhereClauseCondition(domain)).mkString(" AND ")
+        val whereClause = s"id = ${getExampleId(domain)(example)} /* ${example.name} */"
         s"SELECT id FROM ${table.name} WHERE ${whereClause}"
       }
     }
   }
 
+  def getExampleId(domain: Domain)(example: Example): Int = {
+    val entity: Entity = getTopLevelEntity(domain)(domain.domainTypeForExample(example).asInstanceOf[Entity])
+    val examplesInSameTable: Seq[Example] = (entity +: getSubclassesDeep(domain)(entity)).flatMap(_.getExamples)
+    examplesInSameTable.indexOf(example) + 1
+  }
+
   def exampleToInsertValuesGroup(d: Domain)(table: Table)(example: Example): String = {
     table.columns.flatMap(column => {
       if (column.isPrimaryKey) {
-        None
+        Some(s"${getExampleId(d)(example)} /* ${example.name} */")
       } else {
         if (column.fields.isEmpty) {
           // One side of one-to-many list example

@@ -1,4 +1,5 @@
 INSERT INTO person (
+  id,
   first_name,
   last_name,
   company,
@@ -9,6 +10,7 @@ INSERT INTO person (
   password,
   key_code
 ) VALUES (
+  1 /* Ville Peurala */,
   'Ville',
   'Peurala',
   NULL,
@@ -19,6 +21,7 @@ INSERT INTO person (
   NULL,
   NULL
 ), (
+  2 /* Tero Packalen */,
   'Tero',
   'Packalen',
   NULL,
@@ -29,9 +32,10 @@ INSERT INTO person (
   NULL,
   NULL
 ), (
+  3 /* Ville Peurala with contact information */,
   'Ville',
   'Peurala',
-  NULL,
+  SELECT id FROM company WHERE id = 3 /* STX Group */,
   'ville.peurala@mail.com',
   '050 - 352 7878',
   NULL,
@@ -39,9 +43,10 @@ INSERT INTO person (
   NULL,
   NULL
 ), (
+  4 /* Tero Packalen with contact information */,
   'Tero',
   'Packalen',
-  NULL,
+  SELECT id FROM company WHERE id = 2 /* Maersk */,
   'tero.packalen@yard.com',
   '040 - 568 3313',
   NULL,
@@ -49,9 +54,10 @@ INSERT INTO person (
   NULL,
   NULL
 ), (
+  5 /* ville.peurala@gmail.com */,
   'Ville',
   'Peurala',
-  SELECT id FROM company WHERE name = 'STX Group',
+  SELECT id FROM company WHERE id = 3 /* STX Group */,
   'ville.peurala@mail.com',
   '050 - 352 7878',
   'true',
@@ -59,9 +65,10 @@ INSERT INTO person (
   NULL,
   NULL
 ), (
+  6 /* tero.packalen@yard.com */,
   'Tero',
   'Packalen',
-  SELECT id FROM company WHERE name = 'Maersk',
+  SELECT id FROM company WHERE id = 2 /* Maersk */,
   'tero.packalen@yard.com',
   '040 - 568 3313',
   'true',
@@ -69,6 +76,7 @@ INSERT INTO person (
   NULL,
   NULL
 ), (
+  7 /* Jurij Andrejev */,
   'Jurij',
   'Andrejev',
   NULL,
@@ -79,6 +87,7 @@ INSERT INTO person (
   NULL,
   '4060'
 ), (
+  8 /* Genadij Bogira */,
   'Genadij',
   'Bogira',
   NULL,

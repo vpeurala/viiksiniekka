@@ -26,6 +26,8 @@ public class JdbcCompanyRepositoryTest {
         executeDdl(dataSource, ddl1);
         String ddl2 = stringResource("/ddl/company_insert.sql");
         executeDdl(dataSource, ddl2);
+        executeDdl(dataSource, stringResource("/ddl/person_insert.sql"));
+        executeDdl(dataSource, stringResource("/ddl/notification_insert.sql"));
         repository = new JdbcCompanyRepository(dataSource);
     }
 
