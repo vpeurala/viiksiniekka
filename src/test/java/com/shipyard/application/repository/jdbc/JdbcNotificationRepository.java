@@ -23,8 +23,8 @@ public class JdbcNotificationRepository {
         return sql.select().from("notification INNER JOIN log_entry ON log_entry.notification = notification.id INNER JOIN work_entry ON work_entry.notification = notification.id").fetch(new RecordMapper<Record, Notification>() {
             @Override
             public Notification map(Record record) {
-                Long id = record.get("ID", Long.class);
-                NotificationStatus notificationStatus = NotificationStatus.forValue(record.get("STATUS", String.class));
+                Long id = record.get("notification.id", Long.class);
+                NotificationStatus notificationStatus = NotificationStatus.forValue(record.get("status", String.class));
                 return null;
             }
         });
