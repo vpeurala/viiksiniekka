@@ -16,7 +16,7 @@ public enum NotificationAction {
         return value;
     }
 
-    public NotificationAction forValue(String input) {
+    public static NotificationAction forValue(String input) {
         switch (input) {
             case "Create":
                 return CREATE;

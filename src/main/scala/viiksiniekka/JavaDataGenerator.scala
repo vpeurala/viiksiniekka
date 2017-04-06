@@ -127,7 +127,7 @@ class JavaDataGenerator extends JavaGenerator {
        |        return value;
        |    }
        |
-       |    public ${e.getName} forValue(String input) {
+       |    public static ${e.getName} forValue(String input) {
        |        switch (input) {
        |${e.getMembers.map(m => s"""            case "${m}":\n                return ${ordinaryTextToConstantCase(m)};""").mkString("\n")}
        |            default:

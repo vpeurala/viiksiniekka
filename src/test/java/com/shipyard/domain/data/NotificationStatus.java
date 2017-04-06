@@ -16,7 +16,7 @@ public enum NotificationStatus {
         return value;
     }
 
-    public NotificationStatus forValue(String input) {
+    public static NotificationStatus forValue(String input) {
         switch (input) {
             case "Approved":
                 return APPROVED;

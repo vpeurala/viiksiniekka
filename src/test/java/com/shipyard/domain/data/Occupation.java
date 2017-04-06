@@ -16,7 +16,7 @@ public enum Occupation {
         return value;
     }
 
-    public Occupation forValue(String input) {
+    public static Occupation forValue(String input) {
         switch (input) {
             case "Fitter":
                 return FITTER;
