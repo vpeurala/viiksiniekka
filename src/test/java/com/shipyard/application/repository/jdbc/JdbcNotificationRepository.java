@@ -74,10 +74,29 @@ public class JdbcNotificationRepository {
         return getDsl().select().from("work_entry").where("notification = ?", id).fetch(new RecordMapper<Record, WorkEntryBuilder>() {
             @Override
             public WorkEntryBuilder map(Record record) {
+                System.out.println(record);
                 WorkEntryBuilder workEntryBuilder = new WorkEntryBuilder();
                 workEntryBuilder.withId(record.get("id", Long.class));
                 workEntryBuilder.withWorker(workerForId(record.get("worker", Long.class)));
+
+                LocationBuilder locationBuilder = new LocationBuilder();
+                locationBuilder.withBuilding(buildingForId(record.get("location_building", Long.class)));
+
+                workEntryBuilder.withLocation(locationBuilder);
                 return workEntryBuilder;
+            }
+        });
+    }
+
+    private BuildingBuilder buildingForId(Long id) {
+        return getDsl().select().from("building").where("id = ?", id).fetchOne(new RecordMapper<Record, BuildingBuilder>() {
+            @Override
+            public BuildingBuilder map(Record record) {
+                BuildingBuilder buildingBuilder = new BuildingBuilder();
+                buildingBuilder.withId(record.get("id", Long.class));
+                buildingBuilder.withCode(record.get("code", String.class));
+                buildingBuilder.withDescription(record.get("description", String.class));
+                return buildingBuilder;
             }
         });
     }
