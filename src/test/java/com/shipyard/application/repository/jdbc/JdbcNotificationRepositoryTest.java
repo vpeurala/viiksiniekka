@@ -88,6 +88,13 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
         assertTrue(energyRequirements1.getArgon());
         assertFalse(energyRequirements1.getCompressedAir());
         assertTrue(energyRequirements1.getHotWorks());
+        Worker worker1 = workEntry1.getWorker();
+        assertEquals(7, (long) worker1.getId());
+        assertEquals("Jurij", worker1.getFirstName());
+        assertEquals("Andrejev", worker1.getLastName());
+        assertEquals(1, (long) worker1.getCompany().getId());
+        assertEquals("Ablemans", worker1.getCompany().getName());
+        assertEquals("4060", worker1.getKeyCode());
 
         WorkEntry workEntry2 = workEntries.get(1);
         assertEquals(2, (long) workEntry2.getId());
@@ -97,5 +104,12 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
         assertFalse(energyRequirements2.getArgon());
         assertTrue(energyRequirements2.getCompressedAir());
         assertFalse(energyRequirements2.getHotWorks());
+        Worker worker2 = workEntry2.getWorker();
+        assertEquals(8, (long) worker2.getId());
+        assertEquals("Genadij", worker2.getFirstName());
+        assertEquals("Bogira", worker2.getLastName());
+        assertEquals(2, (long) worker2.getCompany().getId());
+        assertEquals("Maersk", worker2.getCompany().getName());
+        assertEquals("2332", worker2.getKeyCode());
     }
 }
