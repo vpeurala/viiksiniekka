@@ -80,5 +80,11 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
 
     private void assertWorkEntries(List<WorkEntry> workEntries) {
         assertEquals(2, workEntries.size());
+
+        WorkEntry workEntry1 = workEntries.get(0);
+        assertEquals(1, (long) workEntry1.getId());
+
+        WorkEntry workEntry2 = workEntries.get(1);
+        assertEquals(2, (long) workEntry2.getId());
     }
 }

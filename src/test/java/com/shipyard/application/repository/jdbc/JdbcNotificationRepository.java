@@ -3,6 +3,7 @@ package com.shipyard.application.repository.jdbc;
 import com.shipyard.domain.builder.*;
 import com.shipyard.domain.data.Notification;
 import com.shipyard.domain.data.NotificationStatus;
+import com.shipyard.domain.data.Occupation;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -74,15 +75,23 @@ public class JdbcNotificationRepository {
         return getDsl().select().from("work_entry").where("notification = ?", id).fetch(new RecordMapper<Record, WorkEntryBuilder>() {
             @Override
             public WorkEntryBuilder map(Record record) {
-                System.out.println(record);
                 WorkEntryBuilder workEntryBuilder = new WorkEntryBuilder();
                 workEntryBuilder.withId(record.get("id", Long.class));
                 workEntryBuilder.withWorker(workerForId(record.get("worker", Long.class)));
 
                 LocationBuilder locationBuilder = new LocationBuilder();
                 locationBuilder.withBuilding(buildingForId(record.get("location_building", Long.class)));
-
                 workEntryBuilder.withLocation(locationBuilder);
+
+                EnergyRequirementsBuilder energyRequirementsBuilder = new EnergyRequirementsBuilder();
+                energyRequirementsBuilder.withOxyacetylene(record.get("energy_requirements_oxyacetylene", Boolean.class));
+                energyRequirementsBuilder.withCompositeGas(record.get("energy_requirements_composite_gas", Boolean.class));
+                energyRequirementsBuilder.withCompressedAir(record.get("energy_requirements_compressed_air", Boolean.class));
+                energyRequirementsBuilder.withArgon(record.get("energy_requirements_argon", Boolean.class));
+                energyRequirementsBuilder.withHotWorks(record.get("energy_requirements_hot_works", Boolean.class));
+                workEntryBuilder.withEnergyRequirements(energyRequirementsBuilder);
+
+                workEntryBuilder.withOccupation(Occupation.forValue(record.get("occupation", String.class)));
                 return workEntryBuilder;
             }
         });
