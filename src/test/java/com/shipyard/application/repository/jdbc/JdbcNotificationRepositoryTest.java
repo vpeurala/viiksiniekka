@@ -6,8 +6,7 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
     private JdbcNotificationRepository repository;
@@ -83,8 +82,20 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
 
         WorkEntry workEntry1 = workEntries.get(0);
         assertEquals(1, (long) workEntry1.getId());
+        EnergyRequirements energyRequirements1 = workEntry1.getEnergyRequirements();
+        assertTrue(energyRequirements1.getOxyacetylene());
+        assertFalse(energyRequirements1.getCompositeGas());
+        assertTrue(energyRequirements1.getArgon());
+        assertFalse(energyRequirements1.getCompressedAir());
+        assertTrue(energyRequirements1.getHotWorks());
 
         WorkEntry workEntry2 = workEntries.get(1);
         assertEquals(2, (long) workEntry2.getId());
+        EnergyRequirements energyRequirements2 = workEntry2.getEnergyRequirements();
+        assertFalse(energyRequirements2.getOxyacetylene());
+        assertFalse(energyRequirements2.getCompositeGas());
+        assertFalse(energyRequirements2.getArgon());
+        assertTrue(energyRequirements2.getCompressedAir());
+        assertFalse(energyRequirements2.getHotWorks());
     }
 }
