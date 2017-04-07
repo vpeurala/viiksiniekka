@@ -95,6 +95,9 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
         assertEquals(1, (long) worker1.getCompany().getId());
         assertEquals("Ablemans", worker1.getCompany().getName());
         assertEquals("4060", worker1.getKeyCode());
+        assertEquals(2, (long) workEntry1.getLocation().getBuilding().getId());
+        assertEquals("B 44", workEntry1.getLocation().getBuilding().getCode());
+        assertEquals("Factory", workEntry1.getLocation().getBuilding().getDescription());
 
         WorkEntry workEntry2 = workEntries.get(1);
         assertEquals(2, (long) workEntry2.getId());
@@ -111,5 +114,8 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
         assertEquals(2, (long) worker2.getCompany().getId());
         assertEquals("Maersk", worker2.getCompany().getName());
         assertEquals("2332", worker2.getKeyCode());
+        assertEquals(1, (long) workEntry2.getLocation().getBuilding().getId());
+        assertEquals("B 43", workEntry2.getLocation().getBuilding().getCode());
+        assertEquals("Assembly shed", workEntry2.getLocation().getBuilding().getDescription());
     }
 }
