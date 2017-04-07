@@ -162,11 +162,13 @@
                 <example name="Jurij Andrejev">
                     <fieldvalue field="firstName">Jurij</fieldvalue>
                     <fieldvalue field="lastName">Andrejev</fieldvalue>
+                    <fieldvalue field="company" ref="Ablemans"/>
                     <fieldvalue field="keyCode">4060</fieldvalue>
                 </example>
                 <example name="Genadij Bogira">
                     <fieldvalue field="firstName">Genadij</fieldvalue>
                     <fieldvalue field="lastName">Bogira</fieldvalue>
+                    <fieldvalue field="company" ref="Maersk"/>
                     <fieldvalue field="keyCode">2332</fieldvalue>
                 </example>
             </examples>

@@ -62,10 +62,39 @@ public class JdbcNotificationRepository {
                 builder.withSiteForeman(contactPersonForId(record.get("site_foreman", Long.class)));
                 builder.withWorkWeek(workweekBuilder);
                 builder.withAdditionalInformation(record.get("additional_information", String.class));
+
+                builder.withWorkEntries(workEntriesForNotificationId(id));
                 return builder;
             }
         });
         return notificationBuilders.stream().map(NotificationBuilder::build).collect(Collectors.toList());
+    }
+
+    private List<WorkEntryBuilder> workEntriesForNotificationId(Long id) {
+        return getDsl().select().from("work_entry").where("notification = ?", id).fetch(new RecordMapper<Record, WorkEntryBuilder>() {
+            @Override
+            public WorkEntryBuilder map(Record record) {
+                WorkEntryBuilder workEntryBuilder = new WorkEntryBuilder();
+                workEntryBuilder.withId(record.get("id", Long.class));
+                workEntryBuilder.withWorker(workerForId(record.get("worker", Long.class)));
+                return workEntryBuilder;
+            }
+        });
+    }
+
+    private WorkerBuilder workerForId(Long id) {
+        return getDsl().select().from("person").where("id = ?", id).fetchOne(new RecordMapper<Record, WorkerBuilder>() {
+            @Override
+            public WorkerBuilder map(Record record) {
+                WorkerBuilder workerBuilder = new WorkerBuilder();
+                workerBuilder.withId(record.get("id", Long.class));
+                workerBuilder.withFirstName(record.get("first_name", String.class));
+                workerBuilder.withLastName(record.get("last_name", String.class));
+                workerBuilder.withCompany(companyForId(record.get("company", Long.class)));
+                workerBuilder.withKeyCode(record.get("key_code", String.class));
+                return workerBuilder;
+            }
+        });
     }
 
     private DSLContext getDsl() {

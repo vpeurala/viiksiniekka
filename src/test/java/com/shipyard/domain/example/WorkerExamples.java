@@ -7,6 +7,7 @@ public class WorkerExamples {
         return new WorkerBuilder()
                 .withFirstName("Jurij")
                 .withLastName("Andrejev")
+                .withCompany(CompanyExamples.ablemans())
                 .withKeyCode("4060");
     }
 
@@ -14,6 +15,7 @@ public class WorkerExamples {
         return new WorkerBuilder()
                 .withFirstName("Genadij")
                 .withLastName("Bogira")
+                .withCompany(CompanyExamples.maersk())
                 .withKeyCode("2332");
     }
 }

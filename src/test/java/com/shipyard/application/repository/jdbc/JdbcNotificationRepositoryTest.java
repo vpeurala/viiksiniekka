@@ -1,9 +1,6 @@
 package com.shipyard.application.repository.jdbc;
 
-import com.shipyard.domain.data.ContactPerson;
-import com.shipyard.domain.data.Notification;
-import com.shipyard.domain.data.NotificationStatus;
-import com.shipyard.domain.data.Workweek;
+import com.shipyard.domain.data.*;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.Test;
 
@@ -30,6 +27,8 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
         assertYardContact(notification1.getYardContact());
         assertSiteForeman(notification1.getSiteForeman());
         assertWorkWeek(notification1.getWorkWeek());
+        assertEquals("Sunday work is needed because we are behind schedule.", notification1.getAdditionalInformation());
+        assertWorkEntries(notification1.getWorkEntries());
     }
 
     private void assertYardContact(ContactPerson yardContact) {
@@ -79,44 +78,7 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
         assertEquals(0, (int) workWeek.getSunday().get().getEndTime().getMinute());
     }
 
-    /*
-                <example name="Notification 1">
-                    <fieldvalue field="status">Approved</fieldvalue>
-                    <fieldvalue field="yardContact" ref="Tero Packalen with contact information"/>
-                    <fieldvalue field="siteForeman" ref="Ville Peurala with contact information"/>
-                    <fieldvalue field="additionalInformation">Sunday work is needed because we are behind schedule.</fieldvalue>
-                    <fieldvalue field="workWeek" ref="Week 48"/>
-                    <fieldvalue field="workEntries">
-                        <list>
-                            <entry ref="Jurij as a welder in building 44 / ship 2"/>
-                            <entry ref="Genadij as a fitter in building 43"/>
-                        </list>
-                    </fieldvalue>
-                    <fieldvalue field="log">
-                        <list>
-                            <entry ref="Creation of notification 1"/>
-                            <entry ref="Sending of notification 1"/>
-                        </list>
-                    </fieldvalue>
-                </example>
-
-                <example name="Week 48">
-                    <fieldvalue field="weekNumber">48</fieldvalue>
-                    <fieldvalue field="monday" ref="Monday"/>
-                    <fieldvalue field="wednesday" ref="Wednesday"/>
-                    <fieldvalue field="sunday" ref="Sunday"/>
-                </example>
-                <example name="Monday">
-                    <fieldvalue field="startTime" ref="t 10:15" />
-                    <fieldvalue field="endTime" ref="t 18:30" />
-                </example>
-                <example name="Wednesday">
-                    <fieldvalue field="startTime" ref="t 07:00" />
-                    <fieldvalue field="endTime" ref="t 16:20" />
-                </example>
-                <example name="Sunday">
-                    <fieldvalue field="startTime" ref="t 10:00" />
-                    <fieldvalue field="endTime" ref="t 14:00" />
-                </example>
-     */
+    private void assertWorkEntries(List<WorkEntry> workEntries) {
+        assertEquals(2, workEntries.size());
+    }
 }
