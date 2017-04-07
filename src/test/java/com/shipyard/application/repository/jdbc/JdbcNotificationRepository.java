@@ -39,8 +39,21 @@ public class JdbcNotificationRepository {
                 monday.getStartTime().withMinute(record.get("work_week_monday_start_time_minute", Integer.class));
                 monday.getEndTime().withHour(record.get("work_week_monday_end_time_hour", Integer.class));
                 monday.getEndTime().withMinute(record.get("work_week_monday_end_time_minute", Integer.class));
-
                 workweekBuilder.withMonday(monday);
+
+                WorkdayBuilder wednesday = new WorkdayBuilder();
+                wednesday.getStartTime().withHour(record.get("work_week_wednesday_start_time_hour", Integer.class));
+                wednesday.getStartTime().withMinute(record.get("work_week_wednesday_start_time_minute", Integer.class));
+                wednesday.getEndTime().withHour(record.get("work_week_wednesday_end_time_hour", Integer.class));
+                wednesday.getEndTime().withMinute(record.get("work_week_wednesday_end_time_minute", Integer.class));
+                workweekBuilder.withWednesday(wednesday);
+
+                WorkdayBuilder sunday = new WorkdayBuilder();
+                sunday.getStartTime().withHour(record.get("work_week_sunday_start_time_hour", Integer.class));
+                sunday.getStartTime().withMinute(record.get("work_week_sunday_start_time_minute", Integer.class));
+                sunday.getEndTime().withHour(record.get("work_week_sunday_end_time_hour", Integer.class));
+                sunday.getEndTime().withMinute(record.get("work_week_sunday_end_time_minute", Integer.class));
+                workweekBuilder.withSunday(sunday);
 
                 NotificationBuilder builder = new NotificationBuilder();
                 builder.withId(id);

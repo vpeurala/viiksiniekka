@@ -3,12 +3,14 @@ package com.shipyard.application.repository.jdbc;
 import com.shipyard.domain.data.ContactPerson;
 import com.shipyard.domain.data.Notification;
 import com.shipyard.domain.data.NotificationStatus;
+import com.shipyard.domain.data.Workweek;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.Test;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
     private JdbcNotificationRepository repository;
@@ -27,6 +29,7 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
         assertEquals(NotificationStatus.APPROVED, notification1.getStatus());
         assertYardContact(notification1.getYardContact());
         assertSiteForeman(notification1.getSiteForeman());
+        assertWorkWeek(notification1.getWorkWeek());
     }
 
     private void assertYardContact(ContactPerson yardContact) {
@@ -36,7 +39,7 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
         assertEquals(2, (long) yardContact.getCompany().getId());
         assertEquals("Maersk", yardContact.getCompany().getName());
         assertEquals("tero.packalen@yard.com", yardContact.getContactInformation().getEmail());
-        assertEquals("040 - 568 3313", yardContact.getContactInformation().getPhoneNumber());        
+        assertEquals("040 - 568 3313", yardContact.getContactInformation().getPhoneNumber());
     }
 
     private void assertSiteForeman(ContactPerson siteForeman) {
@@ -47,6 +50,33 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
         assertEquals("STX Group", siteForeman.getCompany().getName());
         assertEquals("ville.peurala@mail.com", siteForeman.getContactInformation().getEmail());
         assertEquals("050 - 352 7878", siteForeman.getContactInformation().getPhoneNumber());
+    }
+
+    private void assertWorkWeek(Workweek workWeek) {
+        assertEquals(48, (int) workWeek.getWeekNumber());
+
+        assertEquals(10, (int) workWeek.getMonday().get().getStartTime().getHour());
+        assertEquals(15, (int) workWeek.getMonday().get().getStartTime().getMinute());
+        assertEquals(18, (int) workWeek.getMonday().get().getEndTime().getHour());
+        assertEquals(30, (int) workWeek.getMonday().get().getEndTime().getMinute());
+
+        assertFalse(workWeek.getTuesday().isPresent());
+
+        assertEquals(7, (int) workWeek.getWednesday().get().getStartTime().getHour());
+        assertEquals(0, (int) workWeek.getWednesday().get().getStartTime().getMinute());
+        assertEquals(16, (int) workWeek.getWednesday().get().getEndTime().getHour());
+        assertEquals(20, (int) workWeek.getWednesday().get().getEndTime().getMinute());
+
+        assertFalse(workWeek.getThursday().isPresent());
+
+        assertFalse(workWeek.getFriday().isPresent());
+
+        assertFalse(workWeek.getSaturday().isPresent());
+
+        assertEquals(10, (int) workWeek.getSunday().get().getStartTime().getHour());
+        assertEquals(0, (int) workWeek.getSunday().get().getStartTime().getMinute());
+        assertEquals(14, (int) workWeek.getSunday().get().getEndTime().getHour());
+        assertEquals(0, (int) workWeek.getSunday().get().getEndTime().getMinute());
     }
 
     /*
@@ -68,6 +98,25 @@ public class JdbcNotificationRepositoryTest extends JdbcRepositoryTest {
                             <entry ref="Sending of notification 1"/>
                         </list>
                     </fieldvalue>
+                </example>
+
+                <example name="Week 48">
+                    <fieldvalue field="weekNumber">48</fieldvalue>
+                    <fieldvalue field="monday" ref="Monday"/>
+                    <fieldvalue field="wednesday" ref="Wednesday"/>
+                    <fieldvalue field="sunday" ref="Sunday"/>
+                </example>
+                <example name="Monday">
+                    <fieldvalue field="startTime" ref="t 10:15" />
+                    <fieldvalue field="endTime" ref="t 18:30" />
+                </example>
+                <example name="Wednesday">
+                    <fieldvalue field="startTime" ref="t 07:00" />
+                    <fieldvalue field="endTime" ref="t 16:20" />
+                </example>
+                <example name="Sunday">
+                    <fieldvalue field="startTime" ref="t 10:00" />
+                    <fieldvalue field="endTime" ref="t 14:00" />
                 </example>
      */
 }
