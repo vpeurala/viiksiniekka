@@ -14,7 +14,7 @@ public abstract class JdbcRepositoryTest {
     @Before
     public final void setUp() throws Exception {
         JdbcDataSource dataSource = new JdbcDataSource();
-        dataSource.setUrl("jdbc:h2:mem:shipyard;database_to_upper=false;mode=PostgreSQL");
+        dataSource.setUrl("jdbc:h2:mem:shipyard;database_to_upper=false;mode=PostgreSQL;schema=PUBLIC");
         String ddl1 = stringResource("/ddl/V1__Create_Tables_ShipYard.sql");
         executeDdl(dataSource, ddl1);
         String ddl2 = stringResource("/ddl/V2__Insert_Test_Data_ShipYard.sql");
