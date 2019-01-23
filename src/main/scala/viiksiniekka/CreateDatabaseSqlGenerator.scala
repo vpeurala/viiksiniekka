@@ -15,6 +15,18 @@ class CreateDatabaseSqlGenerator extends Generator {
     topSorted.map(entitySource(d)).mkString("\n")
   }
 
+  def generateDropTables(d: Domain): String = {
+    val topLevelEntities: Seq[Entity] = d.getDomainTypes.filter { p: DomainType =>
+      p match {
+        case e: Entity => isTopLevelEntity(d)(e)
+        case _ => false
+      }
+    }.asInstanceOf[Seq[Entity]]
+    val topSorted: Seq[Entity] = topSort(d)(topLevelEntities)
+    val reversed: Seq[Entity] = topSorted.reverse
+    reversed.map(dropTableSource(d)).mkString("\n")
+  }
+
   private def topSort(d: Domain)(entities: Seq[Entity]): Seq[Entity] = {
     val dependencyGraph: MutableGraph[String] = new MutableGraph[String]
     val tableNames: Seq[String] = entities.map(getTableName)
@@ -174,4 +186,7 @@ class CreateDatabaseSqlGenerator extends Generator {
     }
        |);
        |""".stripMargin
+
+  def dropTableSource(d: Domain)(e: DataContainer): String =
+    s"""DROP TABLE IF EXISTS ${getTableName(e)};"""
 }

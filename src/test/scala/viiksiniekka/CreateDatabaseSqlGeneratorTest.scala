@@ -8,12 +8,14 @@ class CreateDatabaseSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
   var shipYard: Domain = _
   var sqlTableCreationStatements: Map[String, String] = _
   var sqlTableCreationStatementsSum: String = _
+  var sqlTableDroppingStatementsSum: String = _
 
   override def beforeAll(): Unit = {
     shipYard = createShipYard
     val generator = new CreateDatabaseSqlGenerator()
     sqlTableCreationStatements = generator.generate(shipYard)
     sqlTableCreationStatementsSum = generator.generateSum(shipYard)
+    sqlTableDroppingStatementsSum = generator.generateDropTables(shipYard)
   }
 
   test("Can generate person table creation sql correctly") {
@@ -65,8 +67,14 @@ class CreateDatabaseSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
   }
 
   test("Can generate sum of table creation sqls correctly in topologically sorted order") {
-    val expectedSource: String = readFile("src/test/resources/ddl/V1__Create_Tables_ShipYard.sql")
+    val expectedSource: String = readFile("src/test/resources/ddl/V2__Create_Tables_ShipYard.sql")
     val actualSource: String = sqlTableCreationStatementsSum
+    assert(expectedSource === actualSource)
+  }
+
+  test("Can generate tqble dropping statement SQL correctly") {
+    val expectedSource: String = readFile("src/test/resources/ddl/V1__Drop_Existing_Tables_ShipYard.sql")
+    val actualSource: String = sqlTableDroppingStatementsSum
     assert(expectedSource === actualSource)
   }
 

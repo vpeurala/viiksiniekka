@@ -15,10 +15,13 @@ public abstract class JdbcRepositoryTest {
     public final void setUp() throws Exception {
         JdbcDataSource dataSource = new JdbcDataSource();
         dataSource.setUrl("jdbc:h2:mem:shipyard;database_to_upper=false;mode=PostgreSQL;schema=PUBLIC");
-        String ddl1 = stringResource("/ddl/V1__Create_Tables_ShipYard.sql");
+        String ddl1 = stringResource
+            ("/ddl/V1__Drop_Existing_Tables_ShipYard.sql");
+        String ddl2 = stringResource("/ddl/V2__Create_Tables_ShipYard.sql");
+        String ddl3 = stringResource("/ddl/V3__Insert_Test_Data_ShipYard.sql");
         executeDdl(dataSource, ddl1);
-        String ddl2 = stringResource("/ddl/V2__Insert_Test_Data_ShipYard.sql");
         executeDdl(dataSource, ddl2);
+        executeDdl(dataSource, ddl3);
         setUpInternal(dataSource);
     }
 

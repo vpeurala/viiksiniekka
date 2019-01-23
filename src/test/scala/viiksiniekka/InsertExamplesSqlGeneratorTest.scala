@@ -135,7 +135,7 @@ class InsertExamplesSqlGeneratorTest extends FunSuite with BeforeAndAfterAll wit
   }
 
   test("Can generate sum of all test data inserts") {
-    val expectedSource: String = readFile("src/test/resources/ddl/V2__Insert_Test_Data_ShipYard.sql")
+    val expectedSource: String = readFile("src/test/resources/ddl/V3__Insert_Test_Data_ShipYard.sql")
     val actualSource = generator.generateSum(shipYard)
     assert(expectedSource === actualSource)
   }
