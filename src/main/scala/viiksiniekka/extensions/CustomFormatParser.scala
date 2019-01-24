@@ -1,3 +1,5 @@
+// OBSOLETE
+/*
 package viiksiniekka.extensions
 
 import viiksiniekka.extensions.DependencyStyle.DependencyStyle
@@ -206,4 +208,4 @@ object CustomFormatParser {
   }
 }
 
-
+*/

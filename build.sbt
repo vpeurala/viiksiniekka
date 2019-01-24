@@ -1,43 +1,12 @@
-lazy val commonSettings = Seq(
-  organization := "fi.villepeurala",
-  version := "0.1.0",
-  scalaVersion := "2.12.0"
-)
+ThisBuild / scalaVersion := "2.12.8"
 
-lazy val root = (project in file(".")).
-  settings(commonSettings: _*).
-  settings(
-    name := "viiksiniekka",
-    libraryDependencies += "org.parboiled" %% "parboiled" % "2.1.3",
-    libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.1",
-    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.1" % "test",
-    libraryDependencies += "junit" % "junit" % "4.12" % "test",
-    libraryDependencies += "org.jooq" % "jooq" % "3.9.1" % "test",
-    libraryDependencies += "com.h2database" % "h2" % "1.4.193" % "test",
-    libraryDependencies += "commons-io" % "commons-io" % "2.5" % "test"
-  ).
-  settings(mainClass in assembly := Some("viiksiniekka.Main"))
+ThisBuild / sbtVersion := "1.2.8"
 
-// add dependencies on standard Scala modules, in a way
-// supporting cross-version publishing
-// taken from: http://github.com/scala/scala-module-dependency-sample
-libraryDependencies := {
-  CrossVersion.partialVersion(scalaVersion.value) match {
-    // if Scala 2.12+ is used, use scala-swing 2.x
-    case Some((2, scalaMajor)) if scalaMajor >= 12 =>
-      libraryDependencies.value ++ Seq(
-        "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
-        "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
-        "org.scala-lang.modules" %% "scala-swing" % "2.0.0-M2")
-    case Some((2, scalaMajor)) if scalaMajor >= 11 =>
-      libraryDependencies.value ++ Seq(
-        "org.scala-lang.modules" %% "scala-xml" % "1.0.6",
-        "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.4",
-        "org.scala-lang.modules" %% "scala-swing" % "1.0.2")
-    case _ =>
-      // or just libraryDependencies.value if you don't depend on scala-swing
-      libraryDependencies.value :+ "org.scala-lang" % "scala-swing" % scalaVersion.value
-  }
-}
-
-scalacOptions += "-feature"
+ThisBuild / libraryDependencies += "com.h2database" % "h2" % "1.4.193"
+ThisBuild / libraryDependencies += "commons-io" % "commons-io" % "2.5"
+ThisBuild / libraryDependencies += "junit" % "junit" % "4.12"
+ThisBuild / libraryDependencies += "org.parboiled" %% "parboiled" % "2.1.3"
+ThisBuild / libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.1.1"
+ThisBuild / libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
+ThisBuild / libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % Test
+ThisBuild / libraryDependencies += "org.jooq" % "jooq" % "3.9.1"
