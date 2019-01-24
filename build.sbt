@@ -10,3 +10,4 @@ ThisBuild / libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "1.
 ThisBuild / libraryDependencies += "org.scalactic" %% "scalactic" % "3.0.5"
 ThisBuild / libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % Test
 ThisBuild / libraryDependencies += "org.jooq" % "jooq" % "3.9.1"
+
