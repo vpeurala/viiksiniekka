@@ -1,8 +1,9 @@
 # A code generator to end all code generators.
 
 # Setup
-  * Install sdkman
+  * Install sdkman [https://sdkman.io/install]
+  * git clone git@github.com:vpeurala/viiksiniekka.git
+  * cd viiksiniekka
   * sdk install sbt 1.2.8
-  > cd viiksiniekka
-  > source .envrc
-  > sbt test
+  * sbt clean test
+
