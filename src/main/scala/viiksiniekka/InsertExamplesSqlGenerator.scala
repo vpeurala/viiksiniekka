@@ -130,8 +130,12 @@ class InsertExamplesSqlGenerator extends Generator {
     }
   }
 
-  def getColumnsForField(d: Domain)(namePrefix: String, optionalPrefix: Boolean, fieldsPrefix: Seq[Field])(f: Field): Seq[Column] = {
-    f match {
+  def getColumnsForField
+    (d: Domain)
+    (namePrefix: String,
+     optionalPrefix: Boolean,
+     fieldsPrefix: Seq[Field])(f: Field): Seq[Column] = {
+     f match {
       case of@OrdinaryField(name, docs, optional, vo: ValueObject) =>
         getColumnsInner(d)(
           namePrefix = if (namePrefix.isEmpty) {

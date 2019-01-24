@@ -5,8 +5,10 @@ import viiksiniekka.StringUtils.{downcaseFirst, indent, upcaseFirst}
 class JavaBuilderGenerator extends JavaGenerator {
   override def generate(domain: Domain): Map[String, String] = {
     val elems = domain.getDomainTypes.flatMap {
-      case e@Entity(name, _, package_, _, _, _) => Some(sourceFileName(s"${name}Builder", package_.getBuilderPackage), dataContainerSource(e))
-      case v@ValueObject(name, _, package_, _, _, _) => Some(sourceFileName(s"${name}Builder", package_.getBuilderPackage), dataContainerSource(v))
+      case e@Entity(name, _, package_, _, _, _) => 
+        Some(sourceFileName(s"${name}Builder", package_.getBuilderPackage), dataContainerSource(e))
+      case v@ValueObject(name, _, package_, _, _, _) => 
+        Some(sourceFileName(s"${name}Builder", package_.getBuilderPackage), dataContainerSource(v))
       case _: Enumeration => None
     } ++ domain.getAggregates.flatMap { a: Aggregate =>
       a.getComponents.map { d: DataContainer =>
