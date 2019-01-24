@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<domain version="1.0.0">
+    <meta>
+        <rootpackage>fi.dias</rootpackage>
+    </meta>
+    <domaintypes>
+        <entity name="SalesAgreement">
+            <doc>A notification about workers and their work hours.</doc>
+            <fields>
+                <field name="salesPhase" type="SalesPhase">
+                    <doc>The state of the notification.</doc>
+                </field>
+                <field name="registryId" type="String">
+                    <doc>An entry in an ASREK registry?</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="SalesAgreement 1">
+                    <fieldvalue field="salesPhase">Initiated</fieldvalue>
+                </example>
+            </examples>
+        </entity>
+        <enumeration name="SalesPhase">
+            <doc>The phase the agreement is in.</doc>
+            <member>Initiated</member>
+            <member>SellerBankAgreedTradeConditions</member>
+            <member>BuyerBankAgreedTradeConditions</member>
+            <member>SellerAndBuyerInvitedToSign</member>
+            <member>SellerBankAcceptedOwnershipTransfer</member>
+            <member>BuyerBankAcceptedOwnershipTransfer</member>
+            <member>Completed</member>
+        </enumeration>
+        <entity name="Person">
+            <doc>A person's basic information (currently only name).</doc>
+            <fields>
+                <field name="firstName" type="String">
+                    <doc>First name, for example "Ville".</doc>
+                </field>
+                <field name="lastName" type="String">
+                    <doc>Last name, for example "Peurala".</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Ville Peurala">
+                    <fieldvalue field="firstName">Ville</fieldvalue>
+                    <fieldvalue field="lastName">Peurala</fieldvalue>
+                </example>
+                <example name="Tero Packalen">
+                    <fieldvalue field="firstName">Tero</fieldvalue>
+                    <fieldvalue field="lastName">Packalen</fieldvalue>
+                </example>
+            </examples>
+        </entity>
+        <valueobject name="ContactInformation">
+            <doc>Email and phone number.</doc>
+            <fields>
+                <field name="email" type="String">
+                    <doc>Email address, for example "ville.peurala@mail.com".</doc>
+                </field>
+                <field name="phoneNumber" type="String">
+                    <doc>Phone number, for example "050 - 352 7878".</doc>
+                </field>
+            </fields>
+            <examples>
+                <example name="Contact information for Ville Peurala">
+                    <fieldvalue field="email">ville.peurala@mail.com</fieldvalue>
+                    <fieldvalue field="phoneNumber">050 - 352 7878</fieldvalue>
+                </example>
+                <example name="Contact information for Tero Packalen">
+                    <fieldvalue field="email">tero.packalen@yard.com</fieldvalue>
+                    <fieldvalue field="phoneNumber">040 - 568 3313</fieldvalue>
+                </example>
+            </examples>
+        </valueobject>
+        <entity name="ContactPerson">
+            <doc>A person with contact information.</doc>
+            <fields>
+                <field name="contactInformation" type="ContactInformation"/>
+            </fields>
+            <examples>
+                <example name="Ville Peurala with contact information">
+                    <fieldvalue field="contactInformation" ref="Contact information for Ville Peurala"/>
+                </example>
+                <example name="Tero Packalen with contact information">
+                    <fieldvalue field="contactInformation" ref="Contact information for Tero Packalen"/>
+                </example>
+            </examples>
+        </entity>
+    </domaintypes>
+    <aggregates>
+        <aggregate name="NewSalesAgreement" rootEntity="SalesAgreement" rootHasId="false">
+        </aggregate>
+    </aggregates>
+    <repositories>
+        <repository name="SalesAgreementRepository">
+            <read name="listAll" orderBy="registryId" output="List SalesAgreement" />
+        </repository>
+    </repositories>
+</domain>
