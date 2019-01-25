@@ -10,7 +10,7 @@
   * sbt clean test
 
 # Measuring test coverage
-  * sbt clear coverage test coverageReport
+  * sbt clean coverage test coverageReport
 
 # Publishing & using
   * sbt assembly
