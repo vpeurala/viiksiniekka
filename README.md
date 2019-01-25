@@ -9,6 +9,9 @@
   * sdk install sbt 1.2.8
   * sbt clean test
 
+# Measuring test coverage
+  * sbt clear coverage test coverageReport
+
 # Publishing & using
   * sbt assembly
   * do things with the assembled uberjar
