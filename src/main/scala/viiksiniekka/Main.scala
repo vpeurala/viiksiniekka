@@ -1,11 +1,21 @@
 package viiksiniekka
 
 import java.io.{File, FileInputStream, PrintWriter}
-
+import org.rogach.scallop._
 import scala.xml.{Elem, XML}
+
+class Configuration(arguments: Seq[String]) extends ScallopConf() {
+  val apples = opt[Int](required = true)
+  val bananas = opt[Int]()
+  val name = trailArg[String]()
+  verify()
+}
 
 object Main {
   def main(args: Array[String]): Unit = {
+    val conf = new Configuration(args)
+    println("Apples are: ${conf.apples}.")
+
     if (args.length != 1) {
       println("Missing argument FILE.")
       printUsage()
@@ -81,5 +91,4 @@ object Main {
       }
     }
   }
-
 }
