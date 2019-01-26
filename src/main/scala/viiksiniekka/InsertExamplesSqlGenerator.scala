@@ -1,7 +1,7 @@
 package viiksiniekka
 
 import viiksiniekka.StringUtils.{camelCaseToSnakeCase, indent}
-import viiksiniekka.graph.MutableGraph
+import viiksiniekka.TopologicalSort.topSort
 
 class InsertExamplesSqlGenerator extends Generator {
   def generateSum(d: Domain): String = {
@@ -13,42 +13,6 @@ class InsertExamplesSqlGenerator extends Generator {
     }.asInstanceOf[Seq[Entity]]
     val topSorted: Seq[Entity] = topSort(d)(topLevelEntities)
     topSorted.map(entitySource(d)).mkString("\n")
-  }
-
-  private def topSort(d: Domain)(entities: Seq[Entity]): Seq[Entity] = {
-    val dependencyGraph: MutableGraph[String] = new MutableGraph[String]
-    val tableNames: Seq[String] = entities.map(getTableName)
-    tableNames.foreach { t => dependencyGraph.addNode(t) }
-    entities.foreach { e =>
-      def handleField(f: Field): Unit = {
-        f match {
-          case l: ListField => ()
-          case o: OrdinaryField if o.getType.isInstanceOf[DataContainer] =>
-            if (tableNames.contains(getTableName(o.getType.asInstanceOf[DataContainer]))) {
-              dependencyGraph.addEdge(getTableName(e), getTableName(o.getType.asInstanceOf[DataContainer]))
-            }
-            o.getType.asInstanceOf[DataContainer].getFields.foreach(handleField)
-          case _ => ()
-        }
-      }
-
-      e.getFields.foreach(handleField)
-      d.getDomainTypes.foreach { dt =>
-        dt.getFields.foreach {
-          case l: ListField => {
-            if (l.getType == e && dt.isInstanceOf[DataContainer]) {
-              dependencyGraph.addEdge(getTableName(e), getTableName(dt.asInstanceOf[DataContainer]))
-            }
-          }
-          case _ => ()
-        }
-      }
-    }
-    dependencyGraph.topSort().reverse.map { n =>
-      d.getDomainTypes.find { dt =>
-        dt.isInstanceOf[DataContainer] && getTableName(dt.asInstanceOf[DataContainer]) == n
-      }.asInstanceOf[Option[Entity]].get
-    }
   }
 
   override def generate(d: Domain): Map[String, String] = {
@@ -73,7 +37,7 @@ class InsertExamplesSqlGenerator extends Generator {
     }
   }
 
-  private def getTableName(e: DataContainer): String = {
+  def getTableName(e: DataContainer): String = {
     e.getExtends match {
       case None => camelCaseToSnakeCase(e.getName)
       case Some(parent) => getTableName(parent.asInstanceOf[DataContainer])
@@ -131,11 +95,11 @@ class InsertExamplesSqlGenerator extends Generator {
   }
 
   def getColumnsForField
-    (d: Domain)
-    (namePrefix: String,
-     optionalPrefix: Boolean,
-     fieldsPrefix: Seq[Field])(f: Field): Seq[Column] = {
-     f match {
+  (d: Domain)
+  (namePrefix: String,
+   optionalPrefix: Boolean,
+   fieldsPrefix: Seq[Field])(f: Field): Seq[Column] = {
+    f match {
       case of@OrdinaryField(name, docs, optional, vo: ValueObject) =>
         getColumnsInner(d)(
           namePrefix = if (namePrefix.isEmpty) {

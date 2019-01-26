@@ -1,7 +1,9 @@
 package viiksiniekka
 
 import java.io.{File, FileInputStream, PrintWriter}
+
 import org.rogach.scallop._
+
 import scala.xml.{Elem, XML}
 
 class ScallopConfiguration(arguments: Seq[String]) extends ScallopConf(arguments) {
@@ -17,29 +19,25 @@ class ScallopConfiguration(arguments: Seq[String]) extends ScallopConf(arguments
 
 object Main {
   def main(args: Array[String]): Unit = {
+    type Filename = String
+    type SourceCode = String
+    type GeneratedFiles = Map[Filename, SourceCode]
+
     val conf = new ScallopConfiguration(args)
-    println("Kotlin is: " + conf.kotlin())
-    println("Java is: " + conf.java())
-    println("Elm is: " + conf.elm())
-    println("domainFilename is: " + conf.domainFileName())
 
-    val fis = new FileInputStream(conf.domainFileName())
-    val xml: Elem = XML.load(fis)
-    val domainEl: DomainEl = DomainXmlParser.fromXml(xml)
-    val domain: Domain = DomainXmlTransformer.toDomain(domainEl)
+    val domain: Domain = fileToDomain(conf.domainFileName())
 
-    val javaObjects: Map[String, String] = new JavaDataGenerator().generate(domain)
-    val javaBuilders: Map[String, String] = new JavaBuilderGenerator().generate(domain)
-    val javaExamples: Map[String, String] = new JavaExamplesGenerator().generate(domain)
-    val sqlTableCreationScript: String = new CreateDatabaseSqlGenerator().generateSum(domain)
-    val elmObjects: Map[String, String] = new ElmDataGenerator().generate(domain) ++
+    val javaObjects: GeneratedFiles = new JavaDataGenerator().generate(domain)
+    val javaBuilders: GeneratedFiles = new JavaBuilderGenerator().generate(domain)
+    val javaExamples: GeneratedFiles = new JavaExamplesGenerator().generate(domain)
+    val sqlTableCreationScript: GeneratedFiles = new CreateDatabaseSqlGenerator().generate(domain)
+    val elmObjects: GeneratedFiles = new ElmDataGenerator().generate(domain) ++
       new ElmDecoderGenerator().generate(domain) ++
       new ElmEncoderGenerator().generate(domain)
 
-    val generatedFiles: Map[String, String] = javaObjects ++
+    val generatedFiles: GeneratedFiles = javaObjects ++
       javaBuilders ++
       javaExamples ++
-      Map("src/main/resources/db/migration/V1__Initial_structure.sql" -> sqlTableCreationScript) ++
       elmObjects
 
     val mkdir = new CachedMkdir
@@ -51,6 +49,7 @@ object Main {
       val pw = new PrintWriter(generatedFile)
       pw.write(content)
       pw.close()
+      println(s"Generated file ${generatedFile}")
     }
 
     println(DomainPrettyPrinter.pp(domain))
@@ -78,5 +77,13 @@ object Main {
         }
       }
     }
+  }
+
+  def fileToDomain(f: File) = {
+    val fis = new FileInputStream(f)
+    val xml: Elem = XML.load(fis)
+    val domainEl: DomainEl = DomainXmlParser.fromXml(xml)
+    val domain: Domain = DomainXmlTransformer.toDomain(domainEl)
+    domain
   }
 }

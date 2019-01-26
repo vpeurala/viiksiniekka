@@ -1,5 +1,7 @@
 package viiksiniekka
 
+import viiksiniekka.StringUtils.camelCaseToSnakeCase
+
 class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq[Aggregate], repositories: Seq[Repository]) {
   def exampleContaining(example: Example): Example = {
     val examplesContaining: Seq[Example] = getExamples.filter { ex =>
@@ -215,6 +217,13 @@ sealed trait DataContainer extends DomainType {
            declaredFields: Seq[Field] = declaredFields,
            extends_ : Option[DataContainer] = extends_,
            examples: Seq[Example] = examples): DataContainer
+
+  def getTableName(): String = {
+    this.getExtends match {
+      case None => camelCaseToSnakeCase(getName)
+      case Some(parent) => parent.asInstanceOf[DataContainer].getTableName()
+    }
+  }
 }
 
 case class Entity(name: String, documentation: String, package_ : Package, declaredFields: Seq[Field], extends_ : Option[DataContainer], examples: Seq[Example]) extends DataContainer {
