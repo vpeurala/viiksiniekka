@@ -27,6 +27,7 @@ class CreateDatabaseSqlGenerator extends Generator {
     reversed.map(dropTableSource(d)).mkString("\n")
   }
 
+  // TODO vpeurala 26.1.2019: Duplicate implementation of topSort? The other is in TopologicalSort class.
   private def topSort(d: Domain)(entities: Seq[Entity]): Seq[Entity] = {
     val dependencyGraph: MutableGraph[String] = new MutableGraph[String]
     val tableNames: Seq[String] = entities.map(_.getTableName)
