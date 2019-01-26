@@ -5,7 +5,7 @@ import viiksiniekka.graph.MutableGraph
 object TopologicalSort {
   def topSort(d: Domain)(entities: Seq[Entity]): Seq[Entity] = {
     val dependencyGraph: MutableGraph[String] = new MutableGraph[String]
-    val tableNames: Seq[String] = entities.map(it => it.getTableName())
+    val tableNames: Seq[String] = entities.map(_.getTableName())
     tableNames.foreach { t => dependencyGraph.addNode(t) }
     entities.foreach { e =>
       def handleField(f: Field): Unit = {
