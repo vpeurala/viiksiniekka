@@ -1,7 +1,7 @@
 package viiksiniekka
 
 import viiksiniekka.StringUtils.{camelCaseToSnakeCase, indent}
-import viiksiniekka.graph.MutableGraph
+import viiksiniekka.TopologicalSort.topSort
 
 class CreateDatabaseSqlGenerator extends Generator {
   def generateSum(d: Domain) = {
