@@ -6,7 +6,7 @@ class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq
   def exampleContaining(example: Example): Example = {
     val examplesContaining: Seq[Example] = getExamples.filter { ex =>
       ex.fieldValues.exists {
-        case ListFieldValue(field, entries) => {
+        case ListFieldValue(_, entries) => {
           entries.exists { le =>
             le.example == example
           }
@@ -50,14 +50,14 @@ class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq
 
   def getEntities: Seq[Entity] = {
     domainTypes.filter {
-      case e: Entity => true
+      case _: Entity => true
       case _ => false
     }.map(_.asInstanceOf[Entity])
   }
 
   def getValueObjects: Seq[ValueObject] = {
     domainTypes.filter {
-      case v: ValueObject => true
+      case _: ValueObject => true
       case _ => false
     }.map(_.asInstanceOf[ValueObject])
   }
@@ -297,7 +297,7 @@ case class ValueObject(name: String, documentation: String, package_ : Package, 
 }
 
 case class Enumeration(name: String, documentation: String, package_ : Package, members: Seq[String]) extends DomainType {
-  private val allFields = Seq(new OrdinaryField(
+  private val allFields = Seq(OrdinaryField(
     name = "value",
     documentation = "Enumeration member value.",
     optional = false,
