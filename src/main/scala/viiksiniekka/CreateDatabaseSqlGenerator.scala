@@ -5,26 +5,25 @@ import viiksiniekka.TopologicalSort.topSort
 
 class CreateDatabaseSqlGenerator extends Generator {
   def generateSum(d: Domain) = {
-    val topLevelEntities: Seq[Entity] = d.getDomainTypes.filter { p: DomainType =>
-      p match {
-        case e: Entity => isTopLevelEntity(d)(e)
-        case _ => false
-      }
-    }.asInstanceOf[Seq[Entity]]
+    val topLevelEntities: Seq[Entity] = getTopLevelEntities(d)
     val topSorted: Seq[Entity] = topSort(d)(topLevelEntities)
     topSorted.map(entitySource(d)).mkString("\n")
   }
 
   def generateDropTables(d: Domain): String = {
-    val topLevelEntities: Seq[Entity] = d.getDomainTypes.filter { p: DomainType =>
+    val topLevelEntities: Seq[Entity] = getTopLevelEntities(d)
+    val topSorted: Seq[Entity] = topSort(d)(topLevelEntities)
+    val reversed: Seq[Entity] = topSorted.reverse
+    reversed.map(dropTableSource(d)).mkString("\n")
+  }
+
+  private def getTopLevelEntities(d: Domain) = {
+    d.getDomainTypes.filter { p: DomainType =>
       p match {
         case e: Entity => isTopLevelEntity(d)(e)
         case _ => false
       }
     }.asInstanceOf[Seq[Entity]]
-    val topSorted: Seq[Entity] = topSort(d)(topLevelEntities)
-    val reversed: Seq[Entity] = topSorted.reverse
-    reversed.map(dropTableSource(d)).mkString("\n")
   }
 
   override def generate(d: Domain): Map[String, String] = {
