@@ -1,66 +1,29 @@
 package viiksiniekka
 
 import viiksiniekka.StringUtils.{camelCaseToSnakeCase, indent}
-import viiksiniekka.graph.MutableGraph
+import viiksiniekka.TopologicalSort.topSort
 
 class CreateDatabaseSqlGenerator extends Generator {
-  def generateSum(d: Domain): String = {
-    val topLevelEntities: Seq[Entity] = d.getDomainTypes.filter { p: DomainType =>
-      p match {
-        case e: Entity => isTopLevelEntity(d)(e)
-        case _ => false
-      }
-    }.asInstanceOf[Seq[Entity]]
+  def generateSum(d: Domain) = {
+    val topLevelEntities: Seq[Entity] = getTopLevelEntities(d)
     val topSorted: Seq[Entity] = topSort(d)(topLevelEntities)
     topSorted.map(entitySource(d)).mkString("\n")
   }
 
   def generateDropTables(d: Domain): String = {
-    val topLevelEntities: Seq[Entity] = d.getDomainTypes.filter { p: DomainType =>
-      p match {
-        case e: Entity => isTopLevelEntity(d)(e)
-        case _ => false
-      }
-    }.asInstanceOf[Seq[Entity]]
+    val topLevelEntities: Seq[Entity] = getTopLevelEntities(d)
     val topSorted: Seq[Entity] = topSort(d)(topLevelEntities)
     val reversed: Seq[Entity] = topSorted.reverse
     reversed.map(dropTableSource(d)).mkString("\n")
   }
 
-  private def topSort(d: Domain)(entities: Seq[Entity]): Seq[Entity] = {
-    val dependencyGraph: MutableGraph[String] = new MutableGraph[String]
-    val tableNames: Seq[String] = entities.map(getTableName)
-    tableNames.foreach { t => dependencyGraph.addNode(t) }
-    entities.foreach { e =>
-      def handleField(f: Field): Unit = {
-        f match {
-          case l: ListField => ()
-          case o: OrdinaryField if o.getType.isInstanceOf[DataContainer] =>
-            if (tableNames.contains(getTableName(o.getType.asInstanceOf[DataContainer]))) {
-              dependencyGraph.addEdge(getTableName(e), getTableName(o.getType.asInstanceOf[DataContainer]))
-            }
-            o.getType.asInstanceOf[DataContainer].getFields.foreach(handleField)
-          case _ => ()
-        }
+  private def getTopLevelEntities(d: Domain) = {
+    d.getDomainTypes.filter { p: DomainType =>
+      p match {
+        case e: Entity => isTopLevelEntity(d)(e)
+        case _ => false
       }
-
-      e.getFields.foreach(handleField)
-      d.getDomainTypes.foreach { dt =>
-        dt.getFields.foreach {
-          case l: ListField => {
-            if (l.getType == e && dt.isInstanceOf[DataContainer]) {
-              dependencyGraph.addEdge(getTableName(e), getTableName(dt.asInstanceOf[DataContainer]))
-            }
-          }
-          case _ => ()
-        }
-      }
-    }
-    dependencyGraph.topSort().reverse.map { n =>
-      d.getDomainTypes.find { dt =>
-        dt.isInstanceOf[DataContainer] && getTableName(dt.asInstanceOf[DataContainer]) == n
-      }.asInstanceOf[Option[Entity]].get
-    }
+    }.asInstanceOf[Seq[Entity]]
   }
 
   override def generate(d: Domain): Map[String, String] = {
@@ -78,13 +41,6 @@ class CreateDatabaseSqlGenerator extends Generator {
     ev match {
       case e: Entity => e.getExtends.isEmpty
       case _: ValueObject => false
-    }
-  }
-
-  private def getTableName(e: DataContainer): String = {
-    e.getExtends match {
-      case None => camelCaseToSnakeCase(e.getName)
-      case Some(parent) => getTableName(parent.asInstanceOf[DataContainer])
     }
   }
 
@@ -129,7 +85,7 @@ class CreateDatabaseSqlGenerator extends Generator {
       case (name_, optional_, LocalTimeType) => s"${camelCaseToSnakeCase(name_)} TIME WITHOUT TIME ZONE${notNull(optional_)}"
       case (name_, optional_, LocalDateTimeType) => s"${camelCaseToSnakeCase(name_)} TIMESTAMP WITHOUT TIME ZONE${notNull(optional_)}"
       case (name_, optional_, e: Enumeration) => s"${camelCaseToSnakeCase(name_)} VARCHAR${notNull(optional_)}"
-      case (name_, optional_, e: Entity) => s"${camelCaseToSnakeCase(name_)} BIGINT${notNull(optional_)} REFERENCES ${getTableName(e)}(id)"
+      case (name_, optional_, e: Entity) => s"${camelCaseToSnakeCase(name_)} BIGINT${notNull(optional_)} REFERENCES ${e.getTableName()}(id)"
       case (name_, optional_, v: ValueObject) => (
         v.getFields.flatMap {
           case of: OrdinaryField => Some(embed(domain)(name_ + "_" + of.getName, optional_ || of.isOptional, of.getType))
@@ -156,7 +112,7 @@ class CreateDatabaseSqlGenerator extends Generator {
         case ListField(_, _, type_) => type_ == manySide
         case _ => false
       }) match {
-        case Some(p: DataContainer) => s"${getTableName(p)} BIGINT NOT NULL REFERENCES ${getTableName(p)}(id)"
+        case Some(p: DataContainer) => s"${p.getTableName()} BIGINT NOT NULL REFERENCES ${p.getTableName()}(id)"
         case None => ""
       }
     } else {
@@ -180,7 +136,7 @@ class CreateDatabaseSqlGenerator extends Generator {
   }
 
   def entitySource(d: Domain)(e: DataContainer): String =
-    s"""CREATE TABLE ${getTableName(e)} (
+    s"""CREATE TABLE ${e.getTableName()} (
        |${
       getColumns(d)(e).map(indent(2)).mkString(",\n")
     }
@@ -188,5 +144,5 @@ class CreateDatabaseSqlGenerator extends Generator {
        |""".stripMargin
 
   def dropTableSource(d: Domain)(e: DataContainer): String =
-    s"""DROP TABLE IF EXISTS ${getTableName(e)};"""
+    s"""DROP TABLE IF EXISTS ${e.getTableName()};"""
 }

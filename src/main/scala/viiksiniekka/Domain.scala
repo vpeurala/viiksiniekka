@@ -1,10 +1,12 @@
 package viiksiniekka
 
+import viiksiniekka.StringUtils.camelCaseToSnakeCase
+
 class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq[Aggregate], repositories: Seq[Repository]) {
   def exampleContaining(example: Example): Example = {
     val examplesContaining: Seq[Example] = getExamples.filter { ex =>
       ex.fieldValues.exists {
-        case ListFieldValue(field, entries) => {
+        case ListFieldValue(_, entries) => {
           entries.exists { le =>
             le.example == example
           }
@@ -48,14 +50,14 @@ class Domain(rootPackage: Package, domainTypes: Seq[DomainType], aggregates: Seq
 
   def getEntities: Seq[Entity] = {
     domainTypes.filter {
-      case e: Entity => true
+      case _: Entity => true
       case _ => false
     }.map(_.asInstanceOf[Entity])
   }
 
   def getValueObjects: Seq[ValueObject] = {
     domainTypes.filter {
-      case v: ValueObject => true
+      case _: ValueObject => true
       case _ => false
     }.map(_.asInstanceOf[ValueObject])
   }
@@ -215,6 +217,13 @@ sealed trait DataContainer extends DomainType {
            declaredFields: Seq[Field] = declaredFields,
            extends_ : Option[DataContainer] = extends_,
            examples: Seq[Example] = examples): DataContainer
+
+  def getTableName(): String = {
+    this.getExtends match {
+      case None => camelCaseToSnakeCase(getName)
+      case Some(parent) => parent.asInstanceOf[DataContainer].getTableName()
+    }
+  }
 }
 
 case class Entity(name: String, documentation: String, package_ : Package, declaredFields: Seq[Field], extends_ : Option[DataContainer], examples: Seq[Example]) extends DataContainer {
@@ -288,7 +297,7 @@ case class ValueObject(name: String, documentation: String, package_ : Package, 
 }
 
 case class Enumeration(name: String, documentation: String, package_ : Package, members: Seq[String]) extends DomainType {
-  private val allFields = Seq(new OrdinaryField(
+  private val allFields = Seq(OrdinaryField(
     name = "value",
     documentation = "Enumeration member value.",
     optional = false,

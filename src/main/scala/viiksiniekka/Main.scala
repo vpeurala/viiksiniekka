@@ -1,57 +1,43 @@
 package viiksiniekka
 
 import java.io.{File, FileInputStream, PrintWriter}
+
 import org.rogach.scallop._
+
 import scala.xml.{Elem, XML}
 
-class Configuration(arguments: Seq[String]) extends ScallopConf(arguments) {
-  val apples = opt[Int](required = true)
-  val bananas = opt[Int]()
-  val name = trailArg[String]()
+class ScallopConfiguration(arguments: Seq[String]) extends ScallopConf(arguments) {
+  version("viiksiniekka 0.2.0 (c) 2019 Ville Peurala")
+  val kotlin = opt[Boolean](required = false)
+  val java = opt[Boolean](required = false)
+  val elm = opt[Boolean](required = false)
+  val domainFileName = trailArg[File]()
+  validateFileExists(domainFileName)
+  validateFileIsFile(domainFileName)
   verify()
 }
 
 object Main {
   def main(args: Array[String]): Unit = {
-    val conf = new Configuration(args)
-    println("Apples are: " + conf.apples())
+    type Filename = String
+    type SourceCode = String
+    type GeneratedFiles = Map[Filename, SourceCode]
 
-    if (args.length != 1) {
-      println("Missing argument FILE.")
-      printUsage()
-      System.exit(1)
-    }
-    val arg: String = args(0)
-    val file = new File(arg)
-    if (!file.exists) {
-      println(s"""File does not exist: ${file.getAbsolutePath}""")
-      printUsage()
-      System.exit(2)
-    }
+    val conf = new ScallopConfiguration(args)
 
-    if (!file.canRead) {
-      println(s"""File exists but cannot be read: ${file.getAbsolutePath}""")
-      printUsage()
-      System.exit(3)
-    }
+    val domain: Domain = fileToDomain(conf.domainFileName())
 
-    val fis = new FileInputStream(file)
-    val xml: Elem = XML.load(fis)
-    val domainEl: DomainEl = DomainXmlParser.fromXml(xml)
-    val domain: Domain = DomainXmlTransformer.toDomain(domainEl)
-
-    val javaObjects: Map[String, String] = new JavaDataGenerator().generate(domain)
-    val javaBuilders: Map[String, String] = new JavaBuilderGenerator().generate(domain)
-    val javaExamples: Map[String, String] = new JavaExamplesGenerator().generate(domain)
-    val sqlTableCreationScript: String = new CreateDatabaseSqlGenerator().generateSum(domain)
-    val elmObjects: Map[String, String] = new ElmDataGenerator().generate(domain) ++
+    val javaObjects: GeneratedFiles = new JavaDataGenerator().generate(domain)
+    val javaBuilders: GeneratedFiles = new JavaBuilderGenerator().generate(domain)
+    val javaExamples: GeneratedFiles = new JavaExamplesGenerator().generate(domain)
+    val sqlTableCreationScript: GeneratedFiles = new CreateDatabaseSqlGenerator().generate(domain)
+    val elmObjects: GeneratedFiles = new ElmDataGenerator().generate(domain) ++
       new ElmDecoderGenerator().generate(domain) ++
       new ElmEncoderGenerator().generate(domain)
 
-    val generatedFiles: Map[String, String] = javaObjects ++
+    val generatedFiles: GeneratedFiles = javaObjects ++
       javaBuilders ++
       javaExamples ++
-      Map("src/main/resources/db/migration/V1__Initial_structure.sql" -> sqlTableCreationScript) ++
       elmObjects
 
     val mkdir = new CachedMkdir
@@ -63,6 +49,7 @@ object Main {
       val pw = new PrintWriter(generatedFile)
       pw.write(content)
       pw.close()
+      println(s"Generated file ${generatedFile}")
     }
 
     println(DomainPrettyPrinter.pp(domain))
@@ -90,5 +77,13 @@ object Main {
         }
       }
     }
+  }
+
+  def fileToDomain(f: File) = {
+    val fis = new FileInputStream(f)
+    val xml: Elem = XML.load(fis)
+    val domainEl: DomainEl = DomainXmlParser.fromXml(xml)
+    val domain: Domain = DomainXmlTransformer.toDomain(domainEl)
+    domain
   }
 }
